@@ -28,6 +28,7 @@ services:
       - translate-network
     volumes:
       - ${SITE_PATH}:/translater
+    command: gunicorn -b 0.0.0.0:8000 --access-logfile - --error-logfile - ulc.wsgi
 
 networks:
   translate-network:

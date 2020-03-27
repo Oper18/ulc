@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block body %}
+        <table class="table table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Место</th>
+                    <th scope="col">Название</th>
+                    <th scope="col">И</th>
+                    <th scope="col">В</th>
+                    <th scope="col">Н</th>
+                    <th scope="col">П</th>
+                    <th scope="col">МЗ</th>
+                    <th scope="col">МП</th>
+                    <th scope="col">РМ</th>
+                    <th scope="col">О</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for team in table %}
+                    {% if forloop.counter == 1 %}<tr bgcolor="#339637">{% elif forloop.counter == table|length %}<tr bgcolor="#ef3e3e">{% else %}<tr>{% endif %}
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td><a href="{{ team.team }}">{{ team.team }}</a></td>
+                        <td>{{ team.games }}</td>
+                        <td>{{ team.wins }}</td>
+                        <td>{{ team.drawn }}</td>
+                        <td>{{ team.loses }}</td>
+                        <td>{{ team.rifl }}</td>
+                        <td>{{ team.concede }}</td>
+                        <td>{{ team.dif }}</td>
+                        <td>{{ team.points }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+{% endblock %}

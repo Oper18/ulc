@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block body %}
+<ul class="list-group">
+    {% if not all_history %}
+        {% for league in leagues %}
+            <li class="list-group-item"><a href="/year/{{ league.season.year }}/{{ league.name }}">{{ league.season.year }}/{{ league.name }}</a></li>
+        {% endfor %}
+    {% else  %}
+        {% for season in seasons %}
+            <a class="btn btn-primary" data-toggle="collapse" href="#history{{ season.0.year }}" role="button" aria-expanded="false" aria-controls="collapseExample">
+                {{ season.0.year }}
+            </a>
+            <div class="collapse" id="history{{ season.0.year }}">
+                <div class="card card-body">
+                    {% for league in season.1 %}
+                        <a href="/year/{{ league.season.year }}/{{ league.name }}">{{ league.season.year }}/{{ league.name }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+</ul>
+{% endblock %}

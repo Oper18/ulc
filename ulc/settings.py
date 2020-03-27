@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import datetime
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -37,6 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'ulc',
+    'accounts',
+    'championat',
 ]
 
 MIDDLEWARE = [
@@ -125,7 +129,9 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
+    os.path.join(BASE_DIR, "ulc/static"),
+    os.path.join(BASE_DIR, "championat/static"),
+    os.path.join(BASE_DIR, "accounts/static"),
 ]
 
 MEDIA_URL = '/media/'
@@ -150,4 +156,10 @@ LOGGING = {
             'propagate': True,
         },
     },
+}
+
+SITE_TITLE = 'ULC'
+NAVIGATION = [['ЧЕМПИОНАТ', (), ''], ['ИСТОРИЯ', (), '/history'], ['РЕЙТИНГ', (), ''], ['О НАС', (('ГЛАВНАЯ', '/'), ('КОНТАКТЫ', 'contacts')), '']]
+ADDITION_DROP_NAVIGATION = {
+    'ЧЕМПИОНАТ'.encode('utf-8'): [('КАЛЕНДАРЬ', '/calendar/' + str(datetime.datetime.now().year)), ('РЕГЛАМЕНТ', '/rules')],
 }

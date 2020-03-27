@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block body %}
+
+    {% for event in calendar %}
+        <a class="btn btn-primary" data-toggle="collapse" href="#calendar{{ event.0.name }}{{ event.1.name }}" role="button" aria-expanded="false" aria-controls="collapseExample">
+            {{ event.0.name }}{{ event.1.name }}
+        </a>
+
+        <div class="collapse" id="calendar{{ event.0.name }}{{ event.1.name }}">
+            <div class="card card-body">
+                <table class="table table-dark table-borderless">
+                    <tbody>
+                        {% for game in event.2 %}
+                            <tr>
+                                <th scope=""row>{{ game.group.league }}{{ game.group.name }}</th>
+                                {% if game.home.logo %}
+                                    <td><img src="/{{ game.home.logo }}" alt="{{ game.home.name }}" style="height:30px; width:30px"></td>
+                                {% else %}
+                                    <td><img src="{% static 'img/fclm_logo.png' %}" alt="{{ game.home.name }}" style="height:30px; width:30px"></td>
+                                {% endif %}
+                                <td><span style="display:block; text-align:right">{{ game.home.name }}</span></td>
+                                {% if not game.off %}
+                                    <td><img src="{% static 'img/vs.png' %}" alt="{{ game.home.name }}" style="height:30px; width:30px; display:block; margin:auto"></td>
+                                {% else %}
+                                    <td><span style="display:block; text-align:center">{{ game.home_goals }}-{{ game.visitors_goals }}</span></td>
+                                {% endif %}
+                                <td><span style="display:block; text-align:left">{{ game.visitors.name }}</span></td>
+                                {% if game.visitors.logo %}
+                                    <td><img src="/{{ game.visitors.logo }}" alt="{{ game.visitors.name }}" style="height:30px; width:30px"></td>
+                                {% else %}
+                                    <td><img src="{% static 'img/fclm_logo.png' %}" alt="{{ game.home.name }}" style="height:30px; width:30px"></td>
+                                {% endif %}
+                                <td><span>{{ game.game_date|date:'H:i d.m.Y' }}</span></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endfor %}
+
+{% endblock %}

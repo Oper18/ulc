@@ -1,3 +1,4 @@
+# coding: utf-8
 """ulc URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
@@ -14,8 +15,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
+from django.conf.urls import url, include
+
+from championat.views import ULCBaseTemplateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    re_path(r'^', include('accounts.urls'), name='accounts'),
+    re_path(r'^', include('championat.urls'), name='championat'),
+    re_path(r'^contacts/$', ULCBaseTemplateView.as_view(template_name='contacts.html'))
 ]
