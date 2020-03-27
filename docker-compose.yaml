@@ -12,7 +12,7 @@ services:
       - ulc-network
     volumes:
       - ${DB_PATH}:/var/lib/postgresql/data
-      - ${DB_DUMP}:/docker-entrypoint-initdb.d
+      - ${DB_DUMP}:/docker-entrypoint-initdb.d/dump.sql
 
   ulc_site:
     image: ulc:latest
