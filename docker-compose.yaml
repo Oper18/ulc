@@ -9,7 +9,7 @@ services:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_DB=ulc
     networks:
-      - translate-network
+      - ulc-network
     volumes:
       - ${DB_PATH}:/var/lib/postgresql/data
       - ${DB_DUMP}:/docker-entrypoint-initdb.d
@@ -23,15 +23,15 @@ services:
     ports:
       - 7998:8000
     depends_on:
-      - translater_db
+      - ulc_db
     networks:
-      - translate-network
+      - ulc-network
     volumes:
       - ${SITE_PATH}:/translater
     command: gunicorn -b 0.0.0.0:8000 --access-logfile - --error-logfile - ulc.wsgi
 
 networks:
-  translate-network:
+  ulc-network:
     driver: bridge
     ipam:
       driver: default
