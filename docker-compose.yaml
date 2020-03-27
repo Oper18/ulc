@@ -21,7 +21,7 @@ services:
       - C_FORCE_ROOT='true'
       - PYTHONUNBUFFERED=1
     ports:
-      - 7998:8000
+      - 41999:8000
     depends_on:
       - ulc_db
     networks:
