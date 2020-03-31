@@ -20,23 +20,76 @@
                                 {% else %}
                                     <td><img src="{% static 'img/fclm_logo.png' %}" alt="{{ game.home.name }}" style="height:30px; width:30px"></td>
                                 {% endif %}
-                                <td><span style="display:block; text-align:right">{{ game.home.name }}</span></td>
+                                <td>
+                                    {% if not game.off and user.is_authenticated and user.player.all.first.is_captain or user.is_staff and not game.off %}
+                                        <select id="home-team-id" size="1" style="display:inline-block; text-align:right; float:right">
+                                            <option>{{ game.home.name }}</option>
+                                            {% for team in teams %}
+                                                {% if game.group in team.group.all and not game.off %}
+                                                    <option value="{{ team.name }}">{{ team.name }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    {% else %}
+                                    <span style="display:block; text-align:right">{{ game.home.name }}</span>
+                                    {% endif %}
+                                </td>
+                                <td align="center">
                                 {% if not game.off %}
-                                    <td><img src="{% static 'img/vs.png' %}" alt="{{ game.home.name }}" style="height:30px; width:30px; display:block; margin:auto"></td>
+                                    {% if user.is_authenticated and user.player.all.first.is_captain or user.is_staff %}
+                                        <input id="home-goals-id" type="number" min="0" step="1" style="display:inline-block; max-width:40px; max-height: 20px">
+                                    {% endif %}
+                                    <img src="{% static 'img/vs.png' %}" alt="{{ game.home.name }}" style="height:30px; width:30px; display:inline-block; margin:auto">
+                                    {% if user.is_authenticated and user.player.all.first.is_captain or user.is_staff %}
+                                        <input id="visitors-goals-id" type="number" min="0" step="1" style="display:inline-block; max-width:40px; max-height: 20px">
+                                    {% endif %}
                                 {% else %}
-                                    <td><span style="display:block; text-align:center">{{ game.home_goals }}-{{ game.visitors_goals }}</span></td>
+                                    <span style="display:block; text-align:center">{{ game.home_goals }}-{{ game.visitors_goals }}</span>
                                 {% endif %}
-                                <td><span style="display:block; text-align:left">{{ game.visitors.name }}</span></td>
+                                </td>
+                                <td>
+                                    {% if not game.off and user.is_authenticated and user.player.all.first.is_captain or user.is_staff and not game.off %}
+                                        <select id="visitors-team-id" size="1" style="display:block; text-align:left; float:left">
+                                            <option>{{ game.visitors.name }}</option>
+                                            {% for team in teams %}
+                                                {% if game.group in team.group.all and not game.off %}
+                                                    <option value="{{ team.name }}">{{ team.name }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    {% else %}
+                                        <span style="display:block; text-align:left">{{ game.visitors.name }}</span>
+                                    {% endif %}
+                                </td>
                                 {% if game.visitors.logo %}
                                     <td><img src="/{{ game.visitors.logo }}" alt="{{ game.visitors.name }}" style="height:30px; width:30px"></td>
                                 {% else %}
                                     <td><img src="{% static 'img/fclm_logo.png' %}" alt="{{ game.home.name }}" style="height:30px; width:30px"></td>
                                 {% endif %}
-                                <td><span>{{ game.game_date|date:'H:i d.m.Y' }}</span></td>
+                                <td>
+                                    {% if not game.off and user.is_authenticated and user.player.all.first.is_captain or user.is_staff and not game.off %}
+                                        <input type="datetime-local" value="{{ game.game_date|date:'Y-m-d\TH:i' }}">
+                                    {% else %}
+                                        <span>{{ game.game_date|date:'H:i d.m.Y' }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if not game.off and user.is_authenticated and user.player.all.first.is_captain or user.is_staff and not game.off %}
+                                        <button id="accept-changed-btn" type="button" class="btn btn-success btn-sm">&#10003;</button>
+                                        <button id="decline-changed-btn" type="button" class="btn btn-danger btn-sm">&#10008;</button>
+                                    {% elif game.off and user.is_authenticated and not user.player.all.first.is_captain %}
+                                        <span>&#127937;</span>
+                                    {% else %}
+                                        <span>&#21325;</span>
+                                    {% endif %}
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
+                {% if user.is_staff or user.player.all.first.is_captain %}
+                <button id="add-game-btn" type="button" class="btn btn-outline-success">Add game</button>
+                {% endif %}
             </div>
         </div>
     {% endfor %}

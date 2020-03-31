@@ -14,6 +14,14 @@ services:
       - ${DB_PATH}:/var/lib/postgresql/data
       - ${DB_DUMP}:/docker-entrypoint-initdb.d
 
+  ulc_redis:
+    image: redis
+    container_name: ulc_redis
+    networks:
+      - ulc-network
+    expose:
+      - "6379"
+
   ulc_site:
     image: ulc:latest
     container_name: ulc_site
@@ -24,11 +32,13 @@ services:
       - 7997:8000
     depends_on:
       - ulc_db
+      - ulc_redis
     networks:
       - ulc-network
     volumes:
       - ${SITE_PATH}:/ulc
-    command: python manage.py runserver 0:8000
+#    command: python manage.py runserver 0:8000
+    command: ./start-dev.sh
 #    command: gunicorn -b 0.0.0.0:8000 --access-logfile - --error-logfile - ulc.wsgi
 
 networks:

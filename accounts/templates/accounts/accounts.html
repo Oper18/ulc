@@ -1,5 +1,68 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/account.css' %}">
+{% endblock %}
 
 {% block body %}
-ACCOUNT
+    {% if user.is_anonymous %}
+        <form>
+            <div class="form-group">
+                <label for="username-input-pg">Логин</label>
+                <input type="input" class="form-control" id="username-input-pg" aria-describedby="emailHelp">
+            </div>
+            <div class="form-group">
+                <label for="password-input-pg">Пароль</label>
+                <input type="password" class="form-control" id="password-input-pg">
+                <small id="danger-mes-pg" class="form-text text-muted" style="display:none; color:#ff0000!important">Password or username is wrong</small>
+            </div>
+            <input type="button" class="btn btn-primary" id="signin-btn-pg" value="Вход">
+        </form>
+    {% elif user.is_staff %}
+        STAFF
+    {% elif user.is_authenticated and user.player.all.first.is_captain %}
+        <div class="account-info-left">
+            <table class="table table-dark">
+                <thead>
+                <tr>
+                    <th scope="col">Player name</th>
+                    <th scope="col">Player number</th>
+                    <th scope="col">Position</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for player in players %}
+                    <tr>
+                        <th scope="row">{{ player.user.first_name }} {{ player.user.last_name }}</th>
+                        <td>{{ player.number }}</td>
+                        <td>{{ player.position }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="account-info-right">
+            <div class="card" style="width: 18rem;">
+                {% if user.player.all.first.logo %}
+                    <img src="{{ user.player.all.first.logo.url }}" class="card-img-top">
+                {% else %}
+                    <img src="{% static 'img/hool_logo.png' %}" class="card-img-top">
+                {% endif %}
+                <div class="card-body">
+                    {% for team in user.player.all.first.team.all %}
+                        <h5 class="card-title">{{ team.name }}</h5>
+                    {% endfor %}
+                    <p class="card-text">Some info will be here</p>
+                    <button type="button" class="btn btn-success" id="invite-btn-pg">Invite player</button>
+                    <button type="button" class="btn btn-secondary" id="logout-btn-pg">Log Out</button>
+                    <label id="invite-mes-label" class="form-text text-muted" style="display:none; color:#ff0000!important"></label>
+                </div>
+            </div>
+        </div>
+    {% elif user.is_authenticated and not user.player.all.first.is_captain %}
+        PLAYER
+    {% endif %}
 {% endblock %}

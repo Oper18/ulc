@@ -28,6 +28,7 @@ services:
       - ulc-network
     volumes:
       - ${SITE_PATH}:/ulc
+    command: ./start.sh
 
 networks:
   ulc-network:

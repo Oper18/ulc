@@ -2,7 +2,7 @@
 
 from django.contrib import admin
 from championat.models import Season, League, Group, Team, Game
-from accounts.models import Player
+from accounts.models import Player, RegistrationKeys
 
 
 class SeasonAdmin(admin.ModelAdmin):
@@ -39,3 +39,9 @@ class PlayerAdmin(admin.ModelAdmin):
     pass
 
 admin.site.register(Player, PlayerAdmin)
+
+
+class RegistrationKeysAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(RegistrationKeys, RegistrationKeysAdmin)

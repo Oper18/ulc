@@ -87,6 +87,7 @@ class ChampionatView(ULCBaseTemplateView):
                 else:
                     team_pos['drawn'] += 1
 
+            team_pos['dif'] = team_pos['rifl'] - team_pos['concede']
             team_pos['points'] = team_pos['wins'] * 3 + team_pos['drawn']
 
             teams.append(team_pos)
@@ -108,6 +109,8 @@ class CalendarView(ChampionatView):
             context['calendar'] = self.calendar(Season.objects.get(year=season))
         except:
             context['calendar'] = self.calendar(Season.objects.all().order_by('created_at').last())
+
+        context['teams'] = Team.objects.all()
 
         return context
 
@@ -142,7 +145,5 @@ class HistoryULCView(ULCBaseTemplateView):
             for season in Season.objects.all():
                 context['seasons'].append((season, League.objects.filter(season=season)))
             context['all_history'] = True
-
-        print('## ', context)
 
         return context

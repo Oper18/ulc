@@ -1,0 +1,12 @@
+.account-info-left {
+    max-width: 50%;
+    float: left;
+    display: inline-block;
+    margin: 0 0.5rem;
+}
+.account-info-right {
+    max-width: 50%;
+    float: right;
+    display: inline-block;
+    margin: 0 0.5rem;
+}

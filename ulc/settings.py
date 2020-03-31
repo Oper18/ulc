@@ -163,3 +163,8 @@ NAVIGATION = [['ЧЕМПИОНАТ', (), ''], ['ИСТОРИЯ', (), '/history']
 ADDITION_DROP_NAVIGATION = {
     'ЧЕМПИОНАТ'.encode('utf-8'): [('КАЛЕНДАРЬ', '/calendar/' + str(datetime.datetime.now().year)), ('РЕГЛАМЕНТ', '/rules')],
 }
+
+LOGIN_URL = '/account'
+
+CELERY_RESULT_BACKEND = 'redis://ulc_redis/1'
+BROKER_URL = 'redis://ulc_redis/1'
