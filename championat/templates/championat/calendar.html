@@ -80,8 +80,8 @@
                                 </td>
                                 <td>
                                     {% if not game.off and user.is_authenticated and user.player.all.first.is_captain or user.is_staff and not game.off %}
-                                        <button id="accept-changed-btn" type="button" class="btn btn-success btn-sm">&#10003;</button>
-                                        <button id="decline-changed-btn" type="button" class="btn btn-danger btn-sm">&#10008;</button>
+                                        <button id="accept-changed-btn" type="button" class="btn btn-success btn-sm" data-user="{% if user.is_staff %}staff{% else %}captain{% endif %}">&#10003;</button>
+                                        <button id="decline-changed-btn" type="button" class="btn btn-danger btn-sm" data-user="{% if user.is_staff %}staff{% else %}captain{% endif %}">&#10008;</button>
                                     {% elif game.off and user.is_authenticated %}
                                         <span>&#127937;</span>
                                     {% else %}
@@ -92,8 +92,8 @@
                         {% endfor %}
                     </tbody>
                 </table>
-                {% if user.is_staff or user.player.all.first.is_captain %}
-                <button id="add-game-btn" type="button" class="btn btn-outline-success">Add game</button>
+                {% if user.is_staff %}
+                    <button id="add-game-btn" type="button" class="btn btn-outline-success">Add game</button>
                 {% endif %}
             </div>
         </div>

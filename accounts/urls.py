@@ -8,7 +8,7 @@ from accounts.views import AccountBaseView, ulc_login, RegistrationView, invite_
 
 
 urlpatterns = [
-    re_path(r'^account/$', login_required(AccountBaseView.as_view(template_name="accounts/accounts.html")), name='user_account'),
+    re_path(r'^account/$', AccountBaseView.as_view(template_name="accounts/accounts.html"), name='user_account'),
     re_path(r'^account/(?P<id>[0-9]+)/$', login_required(AccountBaseView.as_view(template_name="accounts/accounts.html")), name='user_account'),
     re_path(r'^registration/$', check_registration_key(RegistrationView.as_view(template_name="accounts/registration.html")), name='registration'),
     re_path(r'^ajax/login/$', ulc_login, name='ajax_login'),

@@ -21,7 +21,34 @@
             <input type="button" class="btn btn-primary" id="signin-btn-pg" value="Вход">
         </form>
     {% elif user.is_staff %}
-        STAFF
+        <div class="account-info-left">
+            {% for championat in championats %}
+                <a class="btn btn-primary" data-toggle="collapse" href="#championat-{{ championat.id }}" role="button" aria-expanded="false">
+                    {{ championat.season.year }} - {{ championat.championat }}
+                </a>
+                <div class="collapse" id="championat-{{ championat.id }}">
+                    <table class="table table-dark">
+                        <thead>
+                        <tr>
+                            <th scope="col">Time</th>
+                            <th scope="col">Day</th>
+                            <th scope="col">Onetime games</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for slot in championat.default_slots.all %}
+                            <tr>
+                                <th>{{ slot.time }}</th>
+                                <th>{{ slot.day }}</th>
+                                <th>{{ slot.onetime_games }}</th>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    <button type="button" class="btn btn-primary btn-sm">Create timeslots for next week</button>
+                </div>
+            {% endfor %}
+        </div>
     {% elif user.is_authenticated and user.player.all.first.is_captain %}
         <div class="account-info-left">
             {% for team in player_teams %}

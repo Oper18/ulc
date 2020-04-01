@@ -15,14 +15,18 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from championat.views import ULCBaseTemplateView
 from accounts.models import Player, RegistrationKeys
-from championat.models import Team
+from championat.models import Team, DefaultTimeSlot, TimeSlot, Championat, Season
 
 class AccountBaseView(ULCBaseTemplateView):
     def get_context_data(self, **kwargs):
         context = super(AccountBaseView, self).get_context_data(**kwargs)
         context['player_teams'] = []
-        for team in self.request.user.player.all().first().team.all():
-            context['player_teams'].append((team, Player.objects.filter(team=team)))
+        if self.request.user.player.all().exists():
+            for team in self.request.user.player.all().first().team.all():
+                context['player_teams'].append((team, Player.objects.filter(team=team)))
+
+        if self.request.user.is_staff:
+            context['championats'] = Championat.objects.filter(season__in=Season.objects.filter(year__gte=datetime.datetime.now().year))
 
         return context
 
@@ -105,3 +109,28 @@ def check_registration_key(request_view):
             else:
                 return HttpResponseForbidden
     return wrapper
+
+
+@csrf_exempt
+def default_slots_ajax(request):
+    championat = Championat.objects.get(pk=request.POST.get('championat'))
+    if request.user.is_staff:
+        create_default_slots(championat)
+
+
+def create_default_slots(championat):
+    for dst in DefaultTimeSlot.objects.filter(championat=championat):
+        if dst.day > datetime.datetime.now().weekday():
+            delta_days = dst.day - datetime.datetime.now().weekday()
+        elif dst.day == datetime.datetime.now().weekday():
+            delta_days = 7
+        elif dst.day < datetime.datetime.now().weekday():
+            delta_days = 7 - datetime.datetime.now().weekday() - dst.day
+
+        year = (datetime.datetime.now() + datetime.timedelta(days=delta_days)).year
+        month = (datetime.datetime.now() + datetime.timedelta(days=delta_days)).month
+        day = (datetime.datetime.now() + datetime.timedelta(days=delta_days)).day
+
+        new_ts, created = TimeSlot.objects.get_or_create(slot=datetime.datetime.combine(datetime.date(year, month, day), dst.time),
+                                                         championat=championat,
+                                                         onetime_games=dst.onetime_games)

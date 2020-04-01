@@ -21,9 +21,30 @@ class Championat(models.Model):
         return self.championat
 
 
+class DefaultTimeSlot(models.Model):
+    DAYS = (
+        (0, 'Monday'),
+        (1, 'Tuesday'),
+        (2, 'Wednesday'),
+        (3, 'Thursday'),
+        (4, 'Friday'),
+        (5, 'Saturday'),
+        (6, 'Sunday')
+    )
+
+    time = models.TimeField(verbose_name='Default game slot')
+    day = models.IntegerField(verbose_name='Day of week', default=6, choices=DAYS)
+    championat = models.ForeignKey(Championat, verbose_name='Championat whis use slot', on_delete=models.CASCADE, related_name='default_slots', null=True)
+    onetime_games = models.IntegerField(verbose_name='Number of onetime games', default=2)
+
+    def __str__(self):
+        return str(self.day) + ' - ' + str(self.time)
+
+
 class TimeSlot(models.Model):
     slot = models.DateTimeField(verbose_name='Game time slot', unique=True)
     championat = models.ForeignKey(Championat, related_name='slots', on_delete=models.CASCADE, verbose_name='Championat\'s slot', null=True)
+    onetime_games = models.IntegerField(verbose_name='Number of onetime games', default=2)
 
     def __str__(self):
         return str(self.slot)

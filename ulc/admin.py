@@ -1,7 +1,7 @@
 # coding: utf-8
 
 from django.contrib import admin
-from championat.models import Season, League, Group, Team, Game, Championat, TimeSlot
+from championat.models import Season, League, Group, Team, Game, Championat, TimeSlot, DefaultTimeSlot
 from accounts.models import Player, RegistrationKeys
 
 
@@ -57,3 +57,9 @@ class TimeSlotAdmin(admin.ModelAdmin):
     pass
 
 admin.site.register(TimeSlot, TimeSlotAdmin)
+
+
+class DefaultTimeSlotAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(DefaultTimeSlot, DefaultTimeSlotAdmin)

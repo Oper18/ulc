@@ -126,9 +126,12 @@ class CalendarView(ChampionatView):
         ts = TimeSlot.objects.filter(slot__gte=datetime.datetime.now()).exclude(slot__gt=datetime.datetime.now() + datetime.timedelta(days=6))
         for league in League.objects.filter(championat=championat):
             for group in Group.objects.filter(league=league):
+                onetime_games = 1
                 for game in Game.objects.filter(group=group):
-                    if game.game_date in ts:
+                    if game.game_date in ts and game.game_date.onetime_games <= onetime_games:
                         ts.exclude(game.game_date)
+                    elif game.game_date in ts and game.game_date.onetime_games > onetime_games:
+                        onetime_games += 1
                 if (datetime.datetime.now() + datetime.timedelta(days=6)).weekday() == 6 and datetime.datetime.now() + datetime.timedelta(days=6) in ts:
                     ts.exclude(slot=datetime.datetime.now() + datetime.timedelta(days=6))
                 c.append((league, group, Game.objects.filter(group=group).order_by('game_date'), ts))
