@@ -6,6 +6,7 @@
     width: 80%;
     margin: 0 auto;
     background-color: #efefef;
+    display: flex;
 }
 
 .workspace-content {

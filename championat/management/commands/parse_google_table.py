@@ -9,7 +9,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
 from django.core.management.base import BaseCommand
-from championat.models import Season, League, Group, Team, Game
+from championat.models import Season, League, Group, Team, Game, Championat, TimeSlot
 
 
 def parse_sheet():
@@ -121,10 +121,11 @@ class Command(BaseCommand):
         teams, games = parse_sheet()
 
         season = Season.objects.get(year=2020)
+        ch = Championat.objects.filter(season=season).first()
 
         for l in teams.keys():
             league, created = League.objects.get_or_create(name=l,
-                                                           season=season)
+                                                           championat=ch)
 
             for g in teams[l].keys():
                 group, created = Group.objects.get_or_create(name=g,
@@ -136,13 +137,17 @@ class Command(BaseCommand):
 
         print(games)
         for game in games:
-            # print(game)
+            print(game)
+
+            ts, created = TimeSlot.objects.get_or_create(slot=game[0],
+                                                         championat=ch)
+
             Game.objects.get_or_create(home=Team.objects.get(name__icontains=game[1]),
                                        visitors=Team.objects.get(name__icontains=game[2]),
                                        home_goals=game[6],
                                        visitors_goals=game[7],
-                                       game_date=game[0],
-                                       season=season,
+                                       game_date=ts,
+                                       championat=ch,
                                        off=False if not game[6] and not game[7] else True,
                                        group=Group.objects.get(name=game[4], league=League.objects.get(name=game[3])) if game[4] != 'ПО' and game[4] != 'СТ' else None,
                                        tour=game[5]

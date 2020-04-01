@@ -13,9 +13,25 @@ class Season(models.Model):
         return str(self.year)
 
 
+class Championat(models.Model):
+    championat = models.CharField(verbose_name='Championat\'s name', max_length=256)
+    season = models.ForeignKey(Season, related_name='championats', on_delete=models.CASCADE, verbose_name='Championat\'s season', null=True)
+
+    def __str__(self):
+        return self.championat
+
+
+class TimeSlot(models.Model):
+    slot = models.DateTimeField(verbose_name='Game time slot', unique=True)
+    championat = models.ForeignKey(Championat, related_name='slots', on_delete=models.CASCADE, verbose_name='Championat\'s slot', null=True)
+
+    def __str__(self):
+        return str(self.slot)
+
+
 class League(models.Model):
     name = models.CharField(verbose_name='League name', max_length=128)
-    season = models.ForeignKey(Season, on_delete=models.CASCADE, null=True, related_name='league')
+    championat = models.ForeignKey(Championat, on_delete=models.CASCADE, null=True, related_name='league')
     logo = models.ImageField(upload_to='league_logo', null=True)
 
     def __str__(self):
@@ -44,8 +60,8 @@ class Game(models.Model):
     visitors = models.ForeignKey(Team, verbose_name='Visitors', related_name='visitors', on_delete=models.CASCADE)
     home_goals = models.IntegerField(default=0, null=True)
     visitors_goals = models.IntegerField(default=0, null=True)
-    game_date = models.DateTimeField(verbose_name='Game time', null=True)
-    season = models.ForeignKey(Season, on_delete=models.CASCADE)
+    game_date = models.ForeignKey(TimeSlot, related_name='games', verbose_name='Game time', null=True, on_delete=models.CASCADE)
+    championat = models.ForeignKey(Championat, on_delete=models.CASCADE, null=True)
     off = models.BooleanField(default=False)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True)
     tour = models.CharField(verbose_name='Group tour', max_length=64, null=True)

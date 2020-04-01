@@ -119,7 +119,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -161,7 +161,7 @@ LOGGING = {
 SITE_TITLE = 'ULC'
 NAVIGATION = [['ЧЕМПИОНАТ', (), ''], ['ИСТОРИЯ', (), '/history'], ['РЕЙТИНГ', (), ''], ['О НАС', (('ГЛАВНАЯ', '/'), ('КОНТАКТЫ', 'contacts')), '']]
 ADDITION_DROP_NAVIGATION = {
-    'ЧЕМПИОНАТ'.encode('utf-8'): [('КАЛЕНДАРЬ', '/calendar/' + str(datetime.datetime.now().year)), ('РЕГЛАМЕНТ', '/rules')],
+    'ЧЕМПИОНАТ'.encode('utf-8'): [('КАЛЕНДАРЬ', '/calendar/{}'), ('РЕГЛАМЕНТ', '/rules')],
 }
 
 LOGIN_URL = '/account'

@@ -21,7 +21,7 @@
                 {% for team in table %}
                     {% if forloop.counter == 1 %}<tr bgcolor="#339637">{% elif forloop.counter == table|length %}<tr bgcolor="#ef3e3e">{% else %}<tr>{% endif %}
                         <th scope="row">{{ forloop.counter }}</th>
-                        <td><a href="{{ team.team }}">{{ team.team }}</a></td>
+                        <td><a href="/team/{{ team.team.id }}">{{ team.team.name }}</a></td>
                         <td>{{ team.games }}</td>
                         <td>{{ team.wins }}</td>
                         <td>{{ team.drawn }}</td>

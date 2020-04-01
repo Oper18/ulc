@@ -11,7 +11,7 @@ from django.conf import settings
 from django.db.models import Q
 from django.http import HttpResponse
 
-from championat.models import Season, League, Group, Team, Game
+from championat.models import Season, League, Group, Team, Game, Championat, TimeSlot
 
 
 class ULCBaseTemplateView(TemplateView):
@@ -29,9 +29,15 @@ class ULCBaseTemplateView(TemplateView):
         context['navs'] = settings.NAVIGATION
 
         drop_item = []
-        for g in Group.objects.filter(league__in=League.objects.filter(season__in=Season.objects.filter(year=datetime.datetime.now().year))):
-            drop_item.append((g.league.name + g.name, '/league/' + re.sub(r' ', '_', g.league.name.lower()) + '/' + re.sub(r' ', '_', g.name) + '/' + str(g.league.season.year)))
-        context['navs'][0][1] = tuple(drop_item + settings.ADDITION_DROP_NAVIGATION[context['navs'][0][0].encode('utf-8')])
+        for g in Group.objects.filter(league__in=League.objects.filter(championat__in=
+                                                                       Championat.objects.filter(season=
+                                                                                                 Season.objects.get(year=datetime.datetime.now().year)))):
+            drop_item.append((g.league.name + g.name, '/league/' + re.sub(r' ', '_', g.league.name.lower()) +
+                              '/' + re.sub(r' ', '_', g.name) + '/' + str(g.league.championat.id)))
+
+        addition_navs = [(i[0], i[1].format(Championat.objects.filter(season=Season.objects.get(year=datetime.datetime.now().year)).last().id))
+                         for i in settings.ADDITION_DROP_NAVIGATION[context['navs'][0][0].encode('utf-8')]]
+        context['navs'][0][1] = tuple(drop_item + addition_navs)
 
         drop_item = []
         for s in Season.objects.all():
@@ -102,26 +108,31 @@ class CalendarView(ChampionatView):
 
         for i in self.request.get_full_path().split('/')[::-1]:
             if len(i) > 0:
-                season = i
+                ch = i
                 break
 
         try:
-            context['calendar'] = self.calendar(Season.objects.get(year=season))
+            context['calendar'] = self.calendar(Championat.objects.get(pk=ch))
         except:
-            context['calendar'] = self.calendar(Season.objects.all().order_by('created_at').last())
+            context['calendar'] = self.calendar(Championat.objects.all().last())
 
         context['teams'] = Team.objects.all()
 
         return context
 
 
-    def calendar(self, season):
+    def calendar(self, championat):
         c = []
-        for league in League.objects.filter(season=season):
+        ts = TimeSlot.objects.filter(slot__gte=datetime.datetime.now()).exclude(slot__gt=datetime.datetime.now() + datetime.timedelta(days=6))
+        for league in League.objects.filter(championat=championat):
             for group in Group.objects.filter(league=league):
-                c.append((league, group, Game.objects.filter(group=group).order_by('game_date')))
+                for game in Game.objects.filter(group=group):
+                    if game.game_date in ts:
+                        ts.exclude(game.game_date)
+                if (datetime.datetime.now() + datetime.timedelta(days=6)).weekday() == 6 and datetime.datetime.now() + datetime.timedelta(days=6) in ts:
+                    ts.exclude(slot=datetime.datetime.now() + datetime.timedelta(days=6))
+                c.append((league, group, Game.objects.filter(group=group).order_by('game_date'), ts))
 
-        # return Game.objects.filter(season=season).order_by('game_date')
         return c
 
 
@@ -136,14 +147,14 @@ class HistoryULCView(ULCBaseTemplateView):
                 break
         context['all_history'] = False
         try:
-            context['leagues'] = League.objects.filter(season=Season.objects.get(year=int(year)))
+            context['championats'] = Championat.objects.filter(season=Season.objects.get(year=int(year)))
         except:
-            context['leagues'] = []
+            context['championats'] = []
 
         if 'history' in self.request.get_full_path():
             context['seasons'] = []
             for season in Season.objects.all():
-                context['seasons'].append((season, League.objects.filter(season=season)))
+                context['seasons'].append((season, Championat.objects.filter(season=season)))
             context['all_history'] = True
 
         return context

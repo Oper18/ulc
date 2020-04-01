@@ -68,16 +68,21 @@
                                 {% endif %}
                                 <td>
                                     {% if not game.off and user.is_authenticated and user.player.all.first.is_captain or user.is_staff and not game.off %}
-                                        <input type="datetime-local" value="{{ game.game_date|date:'Y-m-d\TH:i' }}">
+                                        <select id="game-date-select" size="1">
+                                            <option>{% if game.game_date %}{{ game.game_date.slot|date:'H:i d.m.Y' }}{% else %}Choose game date{% endif %}</option>
+                                            {% for ts in event.3 %}
+                                                <option>{{ ts.slot|date:'H:i d.m.Y' }}</option>
+                                            {% endfor %}
+                                        </select>
                                     {% else %}
-                                        <span>{{ game.game_date|date:'H:i d.m.Y' }}</span>
+                                        <span>{{ game.game_date.slot|date:'H:i d.m.Y' }}</span>
                                     {% endif %}
                                 </td>
                                 <td>
                                     {% if not game.off and user.is_authenticated and user.player.all.first.is_captain or user.is_staff and not game.off %}
                                         <button id="accept-changed-btn" type="button" class="btn btn-success btn-sm">&#10003;</button>
                                         <button id="decline-changed-btn" type="button" class="btn btn-danger btn-sm">&#10008;</button>
-                                    {% elif game.off and user.is_authenticated and not user.player.all.first.is_captain %}
+                                    {% elif game.off and user.is_authenticated %}
                                         <span>&#127937;</span>
                                     {% else %}
                                         <span>&#21325;</span>

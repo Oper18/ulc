@@ -18,7 +18,13 @@ from accounts.models import Player, RegistrationKeys
 from championat.models import Team
 
 class AccountBaseView(ULCBaseTemplateView):
-    pass
+    def get_context_data(self, **kwargs):
+        context = super(AccountBaseView, self).get_context_data(**kwargs)
+        context['player_teams'] = []
+        for team in self.request.user.player.all().first().team.all():
+            context['player_teams'].append((team, Player.objects.filter(team=team)))
+
+        return context
 
 
 class RegistrationView(ULCBaseTemplateView):
