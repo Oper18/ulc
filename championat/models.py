@@ -83,9 +83,11 @@ class Game(models.Model):
     visitors_goals = models.IntegerField(default=0, null=True)
     game_date = models.ForeignKey(TimeSlot, related_name='games', verbose_name='Game time', null=True, on_delete=models.CASCADE)
     championat = models.ForeignKey(Championat, on_delete=models.CASCADE, null=True)
-    off = models.BooleanField(default=False)
+    off = models.BooleanField(verbose_name='Is game ended', default=False)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True)
     tour = models.CharField(verbose_name='Group tour', max_length=64, null=True)
+    accepted_date = models.BooleanField(verbose_name='Is game time accept', default=False)
+    changed_at = models.DateTimeField(verbose_name='Date of last changes', auto_now_add=True)
 
     def __str__(self):
         return self.home.name + '-' + self.visitors.name
