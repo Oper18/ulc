@@ -3,6 +3,8 @@
 import datetime
 
 from django.db import models
+from django.contrib.auth.models import User
+from django.utils.timezone import now
 
 
 class Season(models.Model):
@@ -64,7 +66,7 @@ class Group(models.Model):
     league = models.ForeignKey(League, on_delete=models.CASCADE, related_name='group')
 
     def __str__(self):
-        return self.name
+        return '{}-{}'.format(self.league.name, self.name)
 
 
 class Team(models.Model):
@@ -88,6 +90,12 @@ class Game(models.Model):
     tour = models.CharField(verbose_name='Group tour', max_length=64, null=True)
     accepted_date = models.BooleanField(verbose_name='Is game time accept', default=False)
     changed_at = models.DateTimeField(verbose_name='Date of last changes', auto_now_add=True)
+    requester = models.ForeignKey(User, verbose_name='Send request for game time', related_name='requester', on_delete=models.CASCADE, null=True)
+    answer = models.ForeignKey(User, verbose_name='Answer request for game time', related_name='answer', on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return self.home.name + '-' + self.visitors.name
+
+    @property
+    def check_date(self):
+        return now() < self.game_date.slot

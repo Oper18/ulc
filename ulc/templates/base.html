@@ -41,7 +41,8 @@
             {% endfor %}
             <div class="btn-group">
 <!--                <a class="navbar-brand" href="{% url 'user_account' %}">-->
-                <a class="navbar-brand" id="signin-logo" data-user="{% if not request.user.is_anonymous %}{{ request.user.id }}{% else %}anonymous{% endif %}">
+                <a id="login-uri-id" class="navbar-brand" id="signin-logo" data-user="{% if not request.user.is_anonymous %}{{ request.user.id }}{% else %}anonymous{% endif %}"
+                   data-target="{% if request.user.is_staff %}staff{% elif request.user.is_authenticated and not request.user.is_staff %}user{% else %}anonymous{% endif %}">
                     <img src="{% static 'img/hool_logo.png' %}" width="30" height="30" class="d-inline-block align-top" alt="">
                 </a>
             </div>

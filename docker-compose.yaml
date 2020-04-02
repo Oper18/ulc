@@ -20,6 +20,7 @@ services:
     environment:
       - C_FORCE_ROOT='true'
       - PYTHONUNBUFFERED=1
+      - TZ=Europe/Moscow
     ports:
       - 41999:8000
     depends_on:

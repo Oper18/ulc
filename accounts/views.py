@@ -21,7 +21,7 @@ class AccountBaseView(ULCBaseTemplateView):
     def get_context_data(self, **kwargs):
         context = super(AccountBaseView, self).get_context_data(**kwargs)
         context['player_teams'] = []
-        if self.request.user.player.all().exists():
+        if not self.request.user.is_anonymous and self.request.user.player.all().exists():
             for team in self.request.user.player.all().first().team.all():
                 context['player_teams'].append((team, Player.objects.filter(team=team)))
 

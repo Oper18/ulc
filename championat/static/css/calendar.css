@@ -1,0 +1,23 @@
+.acception {
+    animation-iteration-count: 2;
+    animation-duration: 2s;
+    animation-name: successful;
+}
+
+.decline {
+    animation-iteration-count: 2;
+    animation-duration: 2s;
+    animation-name: error;
+}
+
+@keyframes successful {
+    from {background-color: #343a40;}
+    50% {background-color: #218838;}
+    to {background-color: #343a40;}
+}
+
+@keyframes error {
+    from {background-color: #343a40;}
+    50% {background-color: #dc3545;}
+    to {background-color: #343a40;}
+}

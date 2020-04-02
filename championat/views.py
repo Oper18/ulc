@@ -3,6 +3,7 @@
 import os
 import datetime
 import re
+import logging
 
 from django.shortcuts import render
 from django.views.generic import TemplateView
@@ -10,8 +11,14 @@ from django.template.context_processors import csrf
 from django.conf import settings
 from django.db.models import Q
 from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
+from django.http import JsonResponse
+from django.utils.timezone import now
 
 from championat.models import Season, League, Group, Team, Game, Championat, TimeSlot
+
+
+logger = logging.getLogger(__name__)
 
 
 class ULCBaseTemplateView(TemplateView):
@@ -161,3 +168,70 @@ class HistoryULCView(ULCBaseTemplateView):
             context['all_history'] = True
 
         return context
+
+
+@csrf_protect
+def accept_changes(request):
+    if request.user.is_staff:
+        if Team.objects.get(pk=request.POST.get('home')) != Team.objects.get(pk=request.POST.get('visitors')):
+            try:
+                if request.POST.get('num') != '0':
+                    game = Game.objects.get(pk=request.POST.get('num'))
+                    game.home = Team.objects.get(pk=request.POST.get('home'))
+                    game.visitors = Team.objects.get(pk=request.POST.get('visitors'))
+                    game.home_goals = request.POST.get('home-goals')
+                    game.visitors_goals = request.POST.get('visitors-goals')
+                    game.game_date = TimeSlot.objects.get(pk=request.POST.get('slot'))
+                    game.group = Group.objects.get(pk=request.POST.get('group'))
+                    game.accepted_date = True
+                    game.changed_at = now()
+                    game.save()
+                else:
+                    Game.objects.create(home=Team.objects.get(pk=request.POST.get('home')),
+                                        visitors=Team.objects.get(pk=request.POST.get('visitors')),
+                                        home_goals=request.POST.get('home-goals'),
+                                        visitors_goals=request.POST.get('visitors-goals'),
+                                        game_date=TimeSlot.objects.get(pk=request.POST.get('slot')),
+                                        group=Group.objects.get(pk=request.POST.get('group')),
+                                        accepted_date=True,
+                                        changed_at=now())
+            except Exception as e:
+                logger.error('Saving game changes down: {}'.format(e))
+                return JsonResponse({'success': False}, status=400)
+            else:
+                return JsonResponse({'success': True}, status=200)
+        else:
+            return JsonResponse({'success': False}, status=400)
+    elif request.user.player.all().exists() and request.user.player.all().first().is_captain:
+        try:
+            game = Game.objects.get(pk=request.POST.get('num'))
+            if not game.requester:
+                if game.off and now() >= game.game_date.slot + datetime.timedelta(hours=1, minutes=30):
+                    game.home_goals = request.POST.get('home-goals')
+                    game.visitors_goals = request.POST.get('visitors-goals')
+                    game.group = Group.objects.get(pk=request.POST.get('group'))
+                    game.requester = request.user
+                    game.changed_at = now()
+                else:
+                    game.game_date = TimeSlot.objects.get(pk=request.POST.get('slot'))
+                    game.changed_at = now()
+                    game.requester = request.user
+                game.save()
+            else:
+                if game.off and now() >= game.game_date.slot + datetime.timedelta(hours=1, minutes=30):
+                    game.off = True
+                    game.answer = request.user
+                else:
+                    game.accepted_date = True
+                    game.answer = request.user
+                game.save()
+        except Exception as e:
+            logger.error('Saving game changes down: {}'.format(e))
+            return JsonResponse({'success': False}, status=400)
+        else:
+            return JsonResponse({'success': True}, status=200)
+
+
+@csrf_protect
+def decline_changes(request):
+    pass

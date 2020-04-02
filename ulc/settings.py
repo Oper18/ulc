@@ -119,7 +119,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = False
+USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
@@ -168,3 +168,5 @@ LOGIN_URL = '/account'
 
 CELERY_RESULT_BACKEND = 'redis://ulc_redis/1'
 BROKER_URL = 'redis://ulc_redis/1'
+
+TIME_ZONE = 'Europe/Moscow'

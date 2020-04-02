@@ -3,7 +3,7 @@
 from django.urls import re_path
 from django.contrib.auth.decorators import login_required
 
-from championat.views import ChampionatView, CalendarView, ULCBaseTemplateView, HistoryULCView
+from championat.views import ChampionatView, CalendarView, ULCBaseTemplateView, HistoryULCView, accept_changes, decline_changes
 
 
 urlpatterns = [
@@ -38,4 +38,7 @@ urlpatterns = [
     re_path(r'^history/$',
             login_required(HistoryULCView.as_view(template_name='championat/history.html')),
             name='history'),
+
+    re_path(r'^ajax/request/accept/$', accept_changes, name='game_changes_accpet'),
+    re_path(r'^ajax/request/decline/$', decline_changes, name='game_changes_decline'),
 ]
