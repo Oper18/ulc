@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/account.css' %}">
+{% endblock %}
+
 {% block body %}
     {% if user.is_anonymous %}
         <form>

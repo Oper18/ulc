@@ -201,9 +201,12 @@ def accept_changes(request):
                     game.requester = request.user
                     game.changed_at = now()
                 else:
-                    game.game_date = TimeSlot.objects.get(pk=request.POST.get('slot'))
-                    game.changed_at = now()
-                    game.requester = request.user
+                    if len(Game.objects.filter(game_date=TimeSlot.objects.get(pk=request.POST.get('slot')))) < TimeSlot.objects.get(pk=request.POST.get('slot')).onetime_games:
+                        game.game_date = TimeSlot.objects.get(pk=request.POST.get('slot'))
+                        game.changed_at = now()
+                        game.requester = request.user
+                    else:
+                        return JsonResponse({'success': False}, status=400)
                 game.save()
             else:
                 if not game.off and now() >= game.game_date.slot + datetime.timedelta(hours=1, minutes=30):

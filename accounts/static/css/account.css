@@ -10,3 +10,11 @@
     display: inline-block;
     margin: 0 0.5rem;
 }
+
+.alert-border {
+    border-color: #dc3545;
+}
+
+.success-border {
+    border-color: #28a745;
+}

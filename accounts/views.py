@@ -134,3 +134,11 @@ def create_default_slots(championat):
         new_ts, created = TimeSlot.objects.get_or_create(slot=datetime.datetime.combine(datetime.date(year, month, day), dst.time),
                                                          championat=championat,
                                                          onetime_games=dst.onetime_games)
+
+
+@csrf_protect
+def test_username(request):
+    user = User.objects.filter(username=request.POST.get('username'))
+    if user.exists():
+        return JsonResponse({'success': True}, status=400)
+    return JsonResponse({'success': True}, status=200)

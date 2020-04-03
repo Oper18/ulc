@@ -4,7 +4,7 @@ $(document).ready(function(){
             $('#signin-form').modal('show');
         }
         else {
-            window.location.replace(location.origin + '/accounts/' + $(this).data('user'));
+            window.location.replace(location.origin + '/account/' + $(this).data('user'));
         }
     })
 })
