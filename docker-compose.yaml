@@ -14,6 +14,14 @@ services:
       - ${DB_PATH}:/var/lib/postgresql/data
       - ${DB_DUMP}:/docker-entrypoint-initdb.d/dump.sql
 
+  ulc_redis:
+    image: redis
+    container_name: ulc_redis
+    networks:
+      - ulc-network
+    expose:
+      - "6379"
+
   ulc_site:
     image: ulc:latest
     container_name: ulc_site
