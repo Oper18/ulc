@@ -60,6 +60,12 @@ class PlayerAdmin(admin.ModelAdmin):
     def name(self, obj):
         return '{} {}'.format(obj.user.first_name, obj.user.last_name)
 
+    def get_form(self, request, obj=None, change=False, **kwargs):
+        form = super(PlayerAdmin, self).get_form(request, obj, change, **kwargs)
+        form.base_fields['logo'].required = False
+
+        return form
+
 admin.site.register(Player, PlayerAdmin)
 
 

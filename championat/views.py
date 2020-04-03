@@ -175,26 +175,15 @@ def accept_changes(request):
     if request.user.is_staff:
         if Team.objects.get(pk=request.POST.get('home')) != Team.objects.get(pk=request.POST.get('visitors')):
             try:
-                if request.POST.get('num') != '0':
-                    game = Game.objects.get(pk=request.POST.get('num'))
-                    game.home = Team.objects.get(pk=request.POST.get('home'))
-                    game.visitors = Team.objects.get(pk=request.POST.get('visitors'))
-                    game.home_goals = request.POST.get('home-goals')
-                    game.visitors_goals = request.POST.get('visitors-goals')
-                    game.game_date = TimeSlot.objects.get(pk=request.POST.get('slot'))
-                    game.group = Group.objects.get(pk=request.POST.get('group'))
-                    game.accepted_date = True
-                    game.changed_at = now()
-                    game.save()
-                else:
-                    Game.objects.create(home=Team.objects.get(pk=request.POST.get('home')),
-                                        visitors=Team.objects.get(pk=request.POST.get('visitors')),
-                                        home_goals=request.POST.get('home-goals'),
-                                        visitors_goals=request.POST.get('visitors-goals'),
-                                        game_date=TimeSlot.objects.get(pk=request.POST.get('slot')),
-                                        group=Group.objects.get(pk=request.POST.get('group')),
-                                        accepted_date=True,
-                                        changed_at=now())
+                game = Game.objects.get(pk=request.POST.get('num'))
+                game.home = Team.objects.get(pk=request.POST.get('home'))
+                game.visitors = Team.objects.get(pk=request.POST.get('visitors'))
+                game.home_goals = request.POST.get('home_goals')
+                game.visitors_goals = request.POST.get('visitors_goals')
+                game.game_date = TimeSlot.objects.get(pk=request.POST.get('slot'))
+                game.accepted_date = True
+                game.changed_at = now()
+                game.save()
             except Exception as e:
                 logger.error('Saving game changes down: {}'.format(e))
                 return JsonResponse({'success': False}, status=400)
@@ -206,10 +195,9 @@ def accept_changes(request):
         try:
             game = Game.objects.get(pk=request.POST.get('num'))
             if not game.requester:
-                if game.off and now() >= game.game_date.slot + datetime.timedelta(hours=1, minutes=30):
-                    game.home_goals = request.POST.get('home-goals')
-                    game.visitors_goals = request.POST.get('visitors-goals')
-                    game.group = Group.objects.get(pk=request.POST.get('group'))
+                if not game.off and now() >= game.game_date.slot + datetime.timedelta(hours=1, minutes=30):
+                    game.home_goals = request.POST.get('home_goals')
+                    game.visitors_goals = request.POST.get('visitors_goals')
                     game.requester = request.user
                     game.changed_at = now()
                 else:
@@ -218,7 +206,7 @@ def accept_changes(request):
                     game.requester = request.user
                 game.save()
             else:
-                if game.off and now() >= game.game_date.slot + datetime.timedelta(hours=1, minutes=30):
+                if not game.off and now() >= game.game_date.slot + datetime.timedelta(hours=1, minutes=30):
                     game.off = True
                     game.answer = request.user
                 else:
@@ -234,4 +222,34 @@ def accept_changes(request):
 
 @csrf_protect
 def decline_changes(request):
-    pass
+    if request.user.is_staff:
+        if Team.objects.get(pk=request.POST.get('home')) != Team.objects.get(pk=request.POST.get('visitors')):
+            try:
+                game = Game.objects.get(pk=request.POST.get('num'))
+                game.accepted_date = True
+                game.changed_at = now()
+                game.save()
+            except Exception as e:
+                logger.error('Decline changes down: {}'.format(e))
+                return JsonResponse({'success': False}, status=400)
+            else:
+                return JsonResponse({'success': True}, status=200)
+    elif request.user.player.all().exists() and request.user.player.all().first().is_captain:
+        try:
+            game = Game.objects.get(pk=request.POST.get('num'))
+            if game.requester:
+                if not game.off and now() >= game.game_date.slot + datetime.timedelta(hours=1, minutes=30):
+                    game.home_goals = None
+                    game.visitors_goals = None
+                    game.requester = None
+                    game.changed_at = now()
+                else:
+                    game.game_date = None
+                    game.changed_at = now()
+                    game.requester = None
+                game.save()
+        except Exception as e:
+            logger.error('Decline changes down: {}'.format(e))
+            return JsonResponse({'success': False}, status=400)
+        else:
+            return JsonResponse({'success': True}, status=200)

@@ -44,12 +44,12 @@
                                 {% if not game.off %}
                                     {% if user.is_authenticated and user.player.all.first.is_captain and game.home in user.player.all.first.team.all or user.is_authenticated and user.player.all.first.is_captain and game.visitors in user.player.all.first.team.all or user.is_staff %}
                                         <input id="home-goals-{{ game.id }}" type="number" min="0" step="1" style="display:inline-block; max-width:40px; max-height: 20px"
-                                               {% if not game.off %}disabled{% endif %}>
+                                               {% if game.check_date or game.home_goals %}disabled{% endif %} {% if game.home_goals %}value="{{ game.home_goals }}"{% endif %}>
                                     {% endif %}
                                     <img src="{% static 'img/vs.png' %}" alt="VS" style="height:30px; width:30px; display:inline-block; margin:auto">
                                     {% if user.is_authenticated and user.player.all.first.is_captain and game.home in user.player.all.first.team.all or user.is_authenticated and user.player.all.first.is_captain and game.visitors in user.player.all.first.team.all or user.is_staff %}
                                         <input id="visitors-goals-{{ game.id }}" type="number" min="0" step="1" style="display:inline-block; max-width:40px; max-height: 20px"
-                                               {% if not game.off %}disabled{% endif %}>
+                                               {% if game.check_date or game.visitors_goals %}disabled{% endif %} {% if game.visitors_goals %}value="{{ game.visitors_goals }}"{% endif %}>
                                     {% endif %}
                                 {% else %}
                                     <span style="display:block; text-align:center">{{ game.home_goals }}-{{ game.visitors_goals }}</span>
@@ -91,7 +91,8 @@
                                     {% if not game.off and user.is_authenticated and user.player.all.first.is_captain and not game.answer and game.home in user.player.all.first.team.all or not game.off and user.is_authenticated and user.player.all.first.is_captain and not game.answer and game.visitors in user.player.all.first.team.all or user.is_staff and not game.off %}
                                         <button id="accept-{{ game.id }}" name="accept-changed-btn" type="button" class="btn btn-success btn-sm" data-user="{% if user.is_staff %}staff{% else %}captain{% endif %}"
                                                 {% if game.requester == user %}disabled{% endif %}>&#10003;</button>
-                                        <button id="decline-{{ game.id }}" name="decline-changed-btn" type="button" class="btn btn-danger btn-sm" data-user="{% if user.is_staff %}staff{% else %}captain{% endif %}">&#10008;</button>
+                                        <button id="decline-{{ game.id }}" name="decline-changed-btn" type="button" class="btn btn-danger btn-sm" data-user="{% if user.is_staff %}staff{% else %}captain{% endif %}"
+                                                {% if not game.requester %}disabled{% endif %}>&#10008;</button>
                                     {% elif game.off and user.is_authenticated %}
                                         <span>&#127937;</span>
                                     {% else %}

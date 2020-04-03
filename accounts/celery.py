@@ -34,5 +34,5 @@ def create_slots():
     from accounts.views import create_default_slots
     from championat.models import Championat, Season
 
-    for championat in Championat.objects.filter(season__in=Season.objects.filter(year__gte=datetime.datetime.now().year)):
+    for championat in Championat.objects.filter(season__in=Season.objects.filter(year__gte=now().year)):
         create_default_slots(championat)

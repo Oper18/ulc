@@ -90,8 +90,8 @@ class Game(models.Model):
     tour = models.CharField(verbose_name='Group tour', max_length=64, null=True)
     accepted_date = models.BooleanField(verbose_name='Is game time accept', default=False)
     changed_at = models.DateTimeField(verbose_name='Date of last changes', auto_now_add=True)
-    requester = models.ForeignKey(User, verbose_name='Send request for game time', related_name='requester', on_delete=models.CASCADE, null=True)
-    answer = models.ForeignKey(User, verbose_name='Answer request for game time', related_name='answer', on_delete=models.CASCADE, null=True)
+    requester = models.ForeignKey(User, verbose_name='Send request', related_name='requester', on_delete=models.CASCADE, null=True)
+    answer = models.ForeignKey(User, verbose_name='Answer request', related_name='answer', on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return self.home.name + '-' + self.visitors.name
