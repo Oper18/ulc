@@ -180,7 +180,8 @@ def accept_changes(request):
                 game.visitors = Team.objects.get(pk=request.POST.get('visitors'))
                 game.home_goals = request.POST.get('home_goals')
                 game.visitors_goals = request.POST.get('visitors_goals')
-                game.game_date = TimeSlot.objects.get(pk=request.POST.get('slot'))
+                if len(Game.objects.filter(game_date=TimeSlot.objects.get(pk=request.POST.get('slot')))) < TimeSlot.objects.get(pk=request.POST.get('slot')).onetime_games:
+                    game.game_date = TimeSlot.objects.get(pk=request.POST.get('slot'))
                 game.accepted_date = True
                 game.changed_at = now()
                 game.save()
