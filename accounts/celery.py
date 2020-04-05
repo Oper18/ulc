@@ -36,3 +36,23 @@ def create_slots():
 
     for championat in Championat.objects.filter(season__in=Season.objects.filter(year__gte=now().year)):
         create_default_slots(championat)
+
+
+@periodic_task(run_every=crontab(hour='*/1'))
+def test_requests():
+    from championat.models import Game, TimeSlot
+
+    for game in Game.objects.filter(changed_at__lte=now() + datetime.timedelta(hours=-72), game_date__slot__gt=now(), off=False, accepted_date=False).\
+            exclude(game_date__slot__range=(now(), now() + datetime.timedelta(hours=24))):
+        game.requester = None
+        game.game_date = None
+        game.save()
+
+    for game in Game.objects.filter(changed_at__lte=now() + datetime.timedelta(hours=-72), game_date__slot__lt=now(), off=False):
+        if game.home_goals and game.visitors_goals:
+            game.off = True
+            game.save()
+
+    for game in Game.objects.filter(game_date__slot__range=(now(), now() + datetime.timedelta(hours=24))):
+        game.accepted_date = True
+        game.save()

@@ -83,7 +83,7 @@ class Game(models.Model):
     visitors = models.ForeignKey(Team, verbose_name='Visitors', related_name='visitors', on_delete=models.CASCADE)
     home_goals = models.IntegerField(default=0, null=True)
     visitors_goals = models.IntegerField(default=0, null=True)
-    game_date = models.ForeignKey(TimeSlot, related_name='games', verbose_name='Game time', null=True, on_delete=models.CASCADE)
+    game_date = models.ForeignKey(TimeSlot, related_name='games', verbose_name='Game time', null=True, on_delete=models.SET_NULL)
     championat = models.ForeignKey(Championat, on_delete=models.CASCADE, null=True)
     off = models.BooleanField(verbose_name='Is game ended', default=False)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True)
