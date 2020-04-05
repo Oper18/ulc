@@ -3,14 +3,13 @@
 
 {% block head %}
 {{ block.super }}
-<link rel="stylesheet" href="{% static 'css/calendar.css' %}">
 <script src="{% static 'js/calendar_set.js' %}"></script>
 {% endblock %}
 
 {% block body %}
 
     {% for event in calendar %}
-        <a class="btn btn-primary" data-toggle="collapse" href="#calendar{{ event.0.name }}{{ event.1.name }}" role="button" aria-expanded="false" aria-controls="collapseExample">
+        <a class="btn btn-primary group-btn" data-toggle="collapse" href="#calendar{{ event.0.name }}{{ event.1.name }}" role="button" aria-expanded="false" aria-controls="collapseExample">
             {{ event.0.name }}{{ event.1.name }}
         </a>
 
@@ -20,13 +19,13 @@
                     <tbody>
                         {% for game in event.2 %}
                             <tr>
-                                <th scope="row"><span id="row-{{ game.id }}" data-target="{{ game.group.id }}">{{ game.group.league }}{{ game.group.name }}</span></th>
+                                <th scope="row" class="desktop"><span id="row-{{ game.id }}" data-target="{{ game.group.id }}">{{ game.group.league }}{{ game.group.name }}</span></th>
                                 {% if game.home.logo %}
-                                    <td><img src="/{{ game.home.logo }}" alt="{{ game.home.name }}" style="height:30px; width:30px"></td>
+                                    <td class="desktop"><img src="/{{ game.home.logo }}" alt="{{ game.home.name }}" style="height:30px; width:30px"></td>
                                 {% else %}
-                                    <td><img src="{% static 'img/fclm_logo.png' %}" alt="{{ game.home.name }}" style="height:30px; width:30px"></td>
+                                    <td class="desktop"><img src="{% static 'img/fclm_logo.png' %}" alt="{{ game.home.name }}" style="height:30px; width:30px"></td>
                                 {% endif %}
-                                <td>
+                                <td class="calendar-table">
                                     {% if not game.off and user.is_staff %}
                                         <select id="home-{{ game.id }}" name="home-team-select" size="1" style="display:inline-block; text-align:right; float:right">
                                             <option data-target="{{ game.home.id }}">{{ game.home.name }}</option>
@@ -40,22 +39,22 @@
                                     <span style="display:block; text-align:right">{{ game.home.name }}</span>
                                     {% endif %}
                                 </td>
-                                <td align="center">
+                                <td align="center" class="calendar-table vs-col">
                                 {% if not game.off %}
                                     {% if user.is_authenticated and user.player.all.first.is_captain and game.home in user.player.all.first.team.all or user.is_authenticated and user.player.all.first.is_captain and game.visitors in user.player.all.first.team.all or user.is_staff %}
-                                        <input id="home-goals-{{ game.id }}" type="number" min="0" step="1" style="display:inline-block; max-width:40px; max-height: 20px"
+                                        <input id="home-goals-{{ game.id }}" type="number" min="0" step="1" class="input-score"
                                                {% if game.check_date or game.home_goals %}disabled{% endif %} {% if game.home_goals %}value="{{ game.home_goals }}"{% endif %}>
                                     {% endif %}
-                                    <img src="{% static 'img/vs.png' %}" alt="VS" style="height:30px; width:30px; display:inline-block; margin:auto">
+                                    <img src="{% static 'img/vs.png' %}" alt="VS" class="vs-logo">
                                     {% if user.is_authenticated and user.player.all.first.is_captain and game.home in user.player.all.first.team.all or user.is_authenticated and user.player.all.first.is_captain and game.visitors in user.player.all.first.team.all or user.is_staff %}
-                                        <input id="visitors-goals-{{ game.id }}" type="number" min="0" step="1" style="display:inline-block; max-width:40px; max-height: 20px"
+                                        <input id="visitors-goals-{{ game.id }}" type="number" min="0" step="1" class="input-score"
                                                {% if game.check_date or game.visitors_goals %}disabled{% endif %} {% if game.visitors_goals %}value="{{ game.visitors_goals }}"{% endif %}>
                                     {% endif %}
                                 {% else %}
                                     <span style="display:block; text-align:center">{{ game.home_goals }}-{{ game.visitors_goals }}</span>
                                 {% endif %}
                                 </td>
-                                <td>
+                                <td class="calendar-table">
                                     {% if not game.off and user.is_staff %}
                                         <select id="visitors-{{ game.id }}" name="visitors-team-select" size="1" style="display:block; text-align:left; float:left">
                                             <option data-target="{{ game.visitors.id }}">{{ game.visitors.name }}</option>
@@ -70,11 +69,11 @@
                                     {% endif %}
                                 </td>
                                 {% if game.visitors.logo %}
-                                    <td><img src="/{{ game.visitors.logo }}" alt="{{ game.visitors.name }}" style="height:30px; width:30px"></td>
+                                    <td class="desktop"><img src="/{{ game.visitors.logo }}" alt="{{ game.visitors.name }}" style="height:30px; width:30px"></td>
                                 {% else %}
-                                    <td><img src="{% static 'img/fclm_logo.png' %}" alt="{{ game.home.name }}" style="height:30px; width:30px"></td>
+                                    <td class="desktop"><img src="{% static 'img/fclm_logo.png' %}" alt="{{ game.home.name }}" style="height:30px; width:30px"></td>
                                 {% endif %}
-                                <td>
+                                <td class="calendar-table">
                                     {% if not game.off and user.is_authenticated and user.player.all.first.is_captain and game.check_date and not game.answer and game.home in user.player.all.first.team.all or not game.off and user.is_authenticated and user.player.all.first.is_captain and game.check_date and not game.answer and game.visitors in user.player.all.first.team.all or user.is_staff and not game.off %}
                                         <select id="game-{{ game.id }}" name="game-date-select" size="1"
                                                 {% if game.requester and not user.is_staff %}disabled{% endif %}>
@@ -87,11 +86,11 @@
                                         <span>{{ game.game_date.slot|date:'H:i d.m.Y' }}</span>
                                     {% endif %}
                                 </td>
-                                <td>
+                                <td class="calendar-table">
                                     {% if not game.off and user.is_authenticated and user.player.all.first.is_captain and not game.answer and game.home in user.player.all.first.team.all or not game.off and user.is_authenticated and user.player.all.first.is_captain and not game.answer and game.visitors in user.player.all.first.team.all or user.is_staff and not game.off %}
-                                        <button id="accept-{{ game.id }}" name="accept-changed-btn" type="button" class="btn btn-success btn-sm" data-user="{% if user.is_staff %}staff{% else %}captain{% endif %}"
+                                        <button id="accept-{{ game.id }}" name="accept-changed-btn" type="button" class="btn btn-success btn-sm calendar-table accept-btn" data-user="{% if user.is_staff %}staff{% else %}captain{% endif %}"
                                                 {% if game.requester == user %}disabled{% endif %}>&#10003;</button>
-                                        <button id="decline-{{ game.id }}" name="decline-changed-btn" type="button" class="btn btn-danger btn-sm" data-user="{% if user.is_staff %}staff{% else %}captain{% endif %}"
+                                        <button id="decline-{{ game.id }}" name="decline-changed-btn" type="button" class="btn btn-danger btn-sm calendar-table decline-btn" data-user="{% if user.is_staff %}staff{% else %}captain{% endif %}"
                                                 {% if not game.requester %}disabled{% endif %}>&#10008;</button>
                                     {% elif game.off and user.is_authenticated %}
                                         <span>&#127937;</span>

@@ -18,3 +18,19 @@
 .success-border {
     border-color: #28a745;
 }
+
+@media screen and (max-width: 1024px) {
+    .account-info-left {
+        max-width: 100%;
+        width: 100%;
+        display: block;
+        float: left;
+    }
+
+    .account-info-right {
+        max-width: 100%;
+        width: 100%;
+        display: block;
+        float: left;
+    }
+}

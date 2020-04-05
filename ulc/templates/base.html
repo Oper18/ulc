@@ -15,6 +15,7 @@
     <script src="{% static 'js/signin_modal.js' %}"></script>
     <script src="{% static 'js/signin.js' %}"></script>
     <script src="{% static 'js/invite_player.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/calendar.css' %}">
     {% endblock %}
 </head>
 <body>
@@ -22,14 +23,13 @@
 
 <div class="top_navigation">
     <nav class="navbar navbar-light bg-light">
-        <a class="navbar-brand" href="/">
-            <img src="{% static 'img/fclm_logo.png' %}" width="30" height="30" class="d-inline-block align-top" alt="">
+        <a class="navbar-brand head-text" href="/">
+            <img src="{% static 'img/fclm_logo.png' %}" class="d-inline-block align-top head-logo" alt="">
             ЧБЛ
         </a>
-        <ul class="nav justify-content-center">
+        <ul class="nav justify-content-center desktop">
             {% for nav in navs %}
                 <div class="btn-group top-menu-btn">
-<!--                    <button type="button" class="btn btn-success">{{ nav.0 }}</button>-->
                     <a href="{{ nav.2 }}" class="btn btn-success">{{ nav.0 }}</a>
                     <button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span class="sr-only">Toggle Dropdown</span>
@@ -42,14 +42,40 @@
                 </div>
             {% endfor %}
             <div class="btn-group">
-<!--                <a class="navbar-brand" href="{% url 'user_account' %}">-->
                 <a class="navbar-brand" id="signin-logo" data-user="{% if not request.user.is_anonymous %}{{ request.user.id }}{% else %}anonymous{% endif %}"
                    data-target="{% if request.user.is_staff %}staff{% elif request.user.is_authenticated and not request.user.is_staff %}user{% else %}anonymous{% endif %}">
-                    <img src="{% static 'img/hool_logo.png' %}" width="30" height="30" class="d-inline-block align-top" alt="">
+                    <img src="{% static 'img/hool_logo.png' %}" class="d-inline-block align-top signin-logo" alt="">
                 </a>
             </div>
         </ul>
+        <button class="navbar-toggler mobile" type="button" data-toggle="collapse" data-target="#head-menu-list" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
     </nav>
+</div>
+
+<div class="collapse mobile-menu" id="head-menu-list">
+    <ul class="nav justify-content-center head-menu">
+        {% for nav in navs %}
+        <div class="btn-group top-menu-btn head-menu-item">
+            <a href="{{ nav.2 }}" class="btn btn-success mobile-font-size">{{ nav.0 }}</a>
+            <button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split mobile-font-size" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="sr-only">Toggle Dropdown</span>
+            </button>
+            <div class="dropdown-menu mobile-font-size">
+                {% for drop_menu in nav.1 %}
+                <a class="dropdown-item" href="{{ drop_menu.1 }}">{{ drop_menu.0 }}</a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+        <div class="btn-group head-menu-item">
+            <a class="navbar-brand" id="signin-logo-mob" data-user="{% if not request.user.is_anonymous %}{{ request.user.id }}{% else %}anonymous{% endif %}"
+               data-target="{% if request.user.is_staff %}staff{% elif request.user.is_authenticated and not request.user.is_staff %}user{% else %}anonymous{% endif %}">
+                <img src="{% static 'img/hool_logo.png' %}" class="d-inline-block align-top signin-logo" alt="">
+            </a>
+        </div>
+    </ul>
 </div>
 
 <div class="modal" tabindex="-1" role="dialog" id="signin-form">
@@ -58,15 +84,15 @@
             <div style="width: 90%; height: 95%; margin: 1rem auto">
                 <form>
                     <div class="form-group">
-                        <label for="username-input">Логин</label>
-                        <input type="input" class="form-control" id="username-input" aria-describedby="emailHelp">
+                        <label for="username-input" class="mobile-font-size">Логин</label>
+                        <input type="input" class="form-control mobile-font-size" id="username-input" aria-describedby="emailHelp">
                     </div>
                     <div class="form-group">
-                        <label for="password-input">Пароль</label>
-                        <input type="password" class="form-control" id="password-input">
-                        <small id="danger-mes" class="form-text text-muted" style="display:none; color:#ff0000!important">Password or username is wrong</small>
+                        <label for="password-input" class="mobile-font-size">Пароль</label>
+                        <input type="password" class="form-control mobile-font-size" id="password-input">
+                        <small id="danger-mes" class="form-text text-muted mobile-font-size" style="display:none; color:#ff0000!important">Password or username is wrong</small>
                     </div>
-                    <input type="button" class="btn btn-primary" id="signin-btn" value="Вход">
+                    <input type="button" class="btn btn-primary mobile-font-size" id="signin-btn" value="Вход">
                 </form>
             </div>
         </div>

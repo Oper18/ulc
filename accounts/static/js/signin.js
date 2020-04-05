@@ -199,20 +199,34 @@ function testPassword(e) {
 var debouncedPassword = _.debounce(testPassword, 500)
 
 $(document).ready(function(){
-    $('#signin-logo').on('click', function(){
-        if ($(this).data('user') == 'anonymous') {
-            $('#signin-form').modal('show');
-        }
-        else {
-            window.location.replace(location.origin + '/account/' + $(this).data('user'));
-        }
-    });
+    if ($('#signin-logo')) {
+        $('#signin-logo').on('click', function(){
+            if ($(this).data('user') == 'anonymous') {
+                $('#signin-form').modal('show');
+            }
+            else {
+                window.location.replace(location.origin + '/account/' + $(this).data('user'));
+            }
+        });
+    }
+    if ($('#signin-logo-mob')) {
+        $('#signin-logo-mob').on('click', function(){
+            if ($(this).data('user') == 'anonymous') {
+                $('#signin-form').modal('show');
+            }
+            else {
+                window.location.replace(location.origin + '/account/' + $(this).data('user'));
+            }
+        });
+    }
 
-    $('#username-input-pg')[0].addEventListener('input', debouncedUserName);
-    $('#password-input-pg')[0].addEventListener('input', debouncedPassword);
-    $('#email-input-pg')[0].addEventListener('input', debouncedEmail);
-    $('#firstname-input-pg')[0].addEventListener('input', debouncedName);
-    $('#lastname-input-pg')[0].addEventListener('input', debouncedSurname);
+    if ($('#username-input-pg')[0] && $('#password-input-pg')[0] && $('#email-input-pg')[0] && $('#firstname-input-pg')[0] && $('#lastname-input-pg')[0]) {
+        $('#username-input-pg')[0].addEventListener('input', debouncedUserName);
+        $('#password-input-pg')[0].addEventListener('input', debouncedPassword);
+        $('#email-input-pg')[0].addEventListener('input', debouncedEmail);
+        $('#firstname-input-pg')[0].addEventListener('input', debouncedName);
+        $('#lastname-input-pg')[0].addEventListener('input', debouncedSurname);
+    }
 
     $('#signin-btn').on('click', Login);
     $('#signin-btn-pg').on('click', Login);

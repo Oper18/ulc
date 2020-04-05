@@ -5,13 +5,13 @@
     <ul class="list-group">
         {% if not all_history %}
             {% for championat in championats %}
-                <a class="btn btn-primary" data-toggle="collapse" href="#history{{ championat.id }}" role="button" aria-expanded="false">
+                <a class="btn btn-primary group-btn" data-toggle="collapse" href="#history{{ championat.id }}" role="button" aria-expanded="false">
                     {{ championat.championat }}
                 </a>
                 <div class="collapse" id="history{{ championat.id }}">
                     <div class="card card-body">
                         {% for league in championat.league.all %}
-                            <li class="list-group-item"><a href="/year/{{ league.championat.season.year }}/{{ league.championat.id }}/{{ league.name }}">{{ league.championat.championat }} - {{ league.name }}</a></li>
+                            <li class="list-group-item group-btn"><a href="/year/{{ league.championat.season.year }}/{{ league.championat.id }}/{{ league.name }}">{{ league.championat.championat }} - {{ league.name }}</a></li>
                         {% endfor %}
                     </div>
                 </div>

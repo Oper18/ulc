@@ -23,7 +23,7 @@ function AcceptChanges(e) {
     $(e.target).parent().parent().removeClass('acception');
     $(e.target).parent().parent().removeClass('decline');
     var num = e.target.id.split('-')[e.target.id.split('-').length-1]
-    if ($('#signin-logo').data('target') == 'staff') {
+    if ($('#signin-logo').data('target') == 'staff' || $('#signin-logo-mob').data('target') == 'staff') {
         let home = $('#home-'+num).find('option:selected').data('target');
         let visitors = $('#visitors-'+num).find('option:selected').data('target');
         let home_goals = $('#home-goals-'+num).val();
@@ -33,7 +33,7 @@ function AcceptChanges(e) {
         let group = $('#row-'+num).data('target');
         var data = {home, visitors, home_goals, visitors_goals, slot, csrfmiddlewaretoken, num, group};
     }
-    else if ($('#signin-logo').data('target') == 'user') {
+    else if ($('#signin-logo').data('target') == 'user' || $('#signin-logo-mob').data('target') == 'user') {
         let home_goals = $('#home-goals-'+num).val();
         let visitors_goals = $('#visitors-goals-'+num).val();
         if ( $('#game-'+num).find('option:selected').data('target') ){
@@ -75,13 +75,13 @@ function DeclineChanges(e) {
     $(e.target).parent().parent().removeClass('acception');
     $(e.target).parent().parent().removeClass('decline');
     var num = e.target.id.split('-')[e.target.id.split('-').length-1]
-    if ($('#signin-logo').data('target') == 'staff') {
+    if ($('#signin-logo').data('target') == 'staff' || $('#signin-logo-mob').data('target') == 'staff') {
         let home = $('#home-'+num).find('option:selected').data('target');
         let visitors = $('#visitors-'+num).find('option:selected').data('target');
         let csrfmiddlewaretoken = $('[name=csrfmiddlewaretoken').val();
         var data = {home, visitors, csrfmiddlewaretoken, num};
     }
-    else if ($('#signin-logo').data('target') == 'user') {
+    else if ($('#signin-logo').data('target') == 'user' || $('#signin-logo-mob').data('target') == 'user') {
         let csrfmiddlewaretoken = $('[name=csrfmiddlewaretoken').val();
         var data = {csrfmiddlewaretoken, num};
     }

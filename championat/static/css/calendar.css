@@ -21,3 +21,59 @@
     50% {background-color: #dc3545;}
     to {background-color: #343a40;}
 }
+
+.group-btn {
+    display: block;
+    width: fit-content;
+    margin-bottom: 0.5rem;
+}
+
+.input-score {
+    display:inline-block;
+    max-width:40px;
+    max-height: 20px;
+}
+
+.vs-col {
+    min-width: 215px;
+}
+
+.vs-logo {
+    height:30px;
+    width:30px;
+    display:inline-block;
+    margin:auto;
+}
+
+@media screen and (max-width: 1024px) {
+    .group-btn {
+        font-size: 3rem;
+    }
+
+    .calendar-table {
+        font-size: 2rem;
+        vertical-align: middle!important;
+    }
+
+    .input-score {
+        max-height: 60px;
+        max-width: 60px;
+    }
+
+    .accept-btn {
+        font-size: 3rem;
+        margin-bottom: 2rem;
+    }
+
+    .decline-btn {
+        font-size: 3rem;
+        margin-bottom: 2rem;
+    }
+
+    .vs-logo {
+        height:50px;
+        width:50px;
+        display:inline-block;
+        margin:auto;
+    }
+}
