@@ -22,10 +22,10 @@ app.autodiscover_tasks()
 
 
 @periodic_task(run_every=crontab(hour='*/1'))
-def debug_task():
+def check_keys():
     from accounts.models import RegistrationKeys
-    for key in RegistrationKeys.objects.filter(inactive=False, valid_date__gte=now()):
-        key.inactive = False
+    for key in RegistrationKeys.objects.filter(inactive=False, valid_date__lte=now()):
+        key.inactive = True
         key.save()
 
 

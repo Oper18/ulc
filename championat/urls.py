@@ -9,7 +9,11 @@ from championat.views import ChampionatView, CalendarView, ULCBaseTemplateView, 
 urlpatterns = [
     re_path(r'^$', ULCBaseTemplateView.as_view(template_name="championat/index.html"), name='championat'),
 
-    re_path(r'^calendar/(?P<id>[0-9]+)/$',
+    # re_path(r'^calendar/(?P<id>[0-9]+)/$',
+    #         login_required(CalendarView.as_view(template_name="championat/calendar.html")),
+    #         name='calendar'),
+
+    re_path(r'^calendar/$',
             login_required(CalendarView.as_view(template_name="championat/calendar.html")),
             name='calendar'),
 

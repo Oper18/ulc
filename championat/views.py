@@ -2,6 +2,7 @@
 
 import os
 import datetime
+import pytz
 import re
 import logging
 
@@ -42,8 +43,7 @@ class ULCBaseTemplateView(TemplateView):
             drop_item.append((g.league.name + g.name, '/league/' + re.sub(r' ', '_', g.league.name.lower()) +
                               '/' + re.sub(r' ', '_', g.name) + '/' + str(g.league.championat.id)))
 
-        addition_navs = [(i[0], i[1].format(Championat.objects.filter(season=Season.objects.get(year=datetime.datetime.now().year)).last().id))
-                         for i in settings.ADDITION_DROP_NAVIGATION[context['navs'][0][0].encode('utf-8')]]
+        addition_navs = [(i[0], i[1]) for i in settings.ADDITION_DROP_NAVIGATION[context['navs'][0][0].encode('utf-8')]]
         context['navs'][0][1] = tuple(drop_item + addition_navs)
 
         drop_item = []
@@ -113,24 +113,18 @@ class CalendarView(ChampionatView):
     def get_context_data(self, **kwargs):
         context = super(CalendarView, self).get_context_data(**kwargs)
 
-        for i in self.request.get_full_path().split('/')[::-1]:
-            if len(i) > 0:
-                ch = i
-                break
-
-        try:
-            context['calendar'] = self.calendar(Championat.objects.get(pk=ch))
-        except:
-            context['calendar'] = self.calendar(Championat.objects.all().last())
+        context['calendar'] = []
+        for champ in Championat.objects.filter(active=True):
+            context['calendar'].append((champ, self.calendar(champ)))
 
         context['teams'] = Team.objects.all()
-
         return context
 
 
     def calendar(self, championat):
         c = []
-        ts = TimeSlot.objects.filter(slot__gte=datetime.datetime.now()).exclude(slot__gt=datetime.datetime.now() + datetime.timedelta(days=6))
+        ts = TimeSlot.objects.filter(slot__gte=datetime.datetime.now(pytz.timezone('Europe/Moscow'))). \
+            exclude(slot__gt=datetime.datetime.now(pytz.timezone('Europe/Moscow')) + datetime.timedelta(days=6))
         for league in League.objects.filter(championat=championat):
             for group in Group.objects.filter(league=league):
                 onetime_games = 1
@@ -140,7 +134,7 @@ class CalendarView(ChampionatView):
                     elif game.game_date in ts and game.game_date.onetime_games > onetime_games:
                         onetime_games += 1
                 if (datetime.datetime.now() + datetime.timedelta(days=6)).weekday() == 6 and datetime.datetime.now() + datetime.timedelta(days=6) in ts:
-                    ts.exclude(slot=datetime.datetime.now() + datetime.timedelta(days=6))
+                    ts.exclude(slot=datetime.datetime.now(pytz.timezone('Europe/Moscow')) + datetime.timedelta(days=6))
                 c.append((league, group, Game.objects.filter(group=group).order_by('game_date'), ts))
 
         return c

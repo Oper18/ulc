@@ -8,7 +8,9 @@
 
 {% block body %}
 
-    {% for event in calendar %}
+{% for champ in calendar %}
+    <h1 class="calendar-champ-header">{{ champ.0.championat }}</h1>
+    {% for event in champ.1 %}
         <a class="btn btn-primary group-btn" data-toggle="collapse" href="#calendar{{ event.0.name }}{{ event.1.name }}" role="button" aria-expanded="false" aria-controls="collapseExample">
             {{ event.0.name }}{{ event.1.name }}
         </a>
@@ -105,5 +107,7 @@
             </div>
         </div>
     {% endfor %}
+<hr>
+{% endfor %}
 
 {% endblock %}

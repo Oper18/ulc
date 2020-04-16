@@ -80,7 +80,7 @@ WSGI_APPLICATION = 'ulc.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'ulc',
+        'NAME': 'ulc2',
         'USER': 'ulc',
         'PASSWORD': 'ulc',
         'HOST': 'ulc_db',
@@ -161,7 +161,7 @@ LOGGING = {
 SITE_TITLE = 'ULC'
 NAVIGATION = [['ЧЕМПИОНАТ', (), ''], ['ИСТОРИЯ', (), '/history'], ['РЕЙТИНГ', (), ''], ['О НАС', (('ГЛАВНАЯ', '/'), ('КОНТАКТЫ', 'contacts')), '']]
 ADDITION_DROP_NAVIGATION = {
-    'ЧЕМПИОНАТ'.encode('utf-8'): [('КАЛЕНДАРЬ', '/calendar/{}'), ('РЕГЛАМЕНТ', '/rules')],
+    'ЧЕМПИОНАТ'.encode('utf-8'): [('КАЛЕНДАРЬ', '/calendar'), ('РЕГЛАМЕНТ', '/rules')],
 }
 
 LOGIN_URL = '/account'

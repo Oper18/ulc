@@ -3,6 +3,7 @@
 import datetime
 
 from django.db import models
+from django.core.exceptions import FieldError
 from django.contrib.auth.models import User
 from django.utils.timezone import now
 
@@ -18,6 +19,7 @@ class Season(models.Model):
 class Championat(models.Model):
     championat = models.CharField(verbose_name='Championat\'s name', max_length=256)
     season = models.ForeignKey(Season, related_name='championats', on_delete=models.CASCADE, verbose_name='Championat\'s season', null=True)
+    active = models.BooleanField(verbose_name='Running championat', default=False)
 
     def __str__(self):
         return self.championat
@@ -66,7 +68,11 @@ class Group(models.Model):
     league = models.ForeignKey(League, on_delete=models.CASCADE, related_name='group')
 
     def __str__(self):
-        return '{}-{}'.format(self.league.name, self.name)
+        return '{}: {}-{}'.format(self.league.championat.championat, self.league.name, self.name)
+
+    @property
+    def teams(self):
+        return Team.objects.all()
 
 
 class Team(models.Model):
@@ -99,3 +105,10 @@ class Game(models.Model):
     @property
     def check_date(self):
         return now() < self.game_date.slot
+
+    def save_base(self, raw=False, force_insert=False,
+                  force_update=False, using=None, update_fields=None):
+        if self.home == self.visitors:
+            raise FieldError
+        else:
+            super(Game, self).save_base(raw, force_insert, force_update, using, update_fields)

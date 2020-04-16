@@ -21,8 +21,12 @@ class AccountBaseView(ULCBaseTemplateView):
     def get_context_data(self, **kwargs):
         context = super(AccountBaseView, self).get_context_data(**kwargs)
         context['player_teams'] = []
-        if not self.request.user.is_anonymous and self.request.user.player.all().exists():
-            for team in self.request.user.player.all().first().team.all():
+        try:
+            player = self.request.user.player
+        except:
+            player = None
+        if not self.request.user.is_anonymous and player:
+            for team in self.request.user.player.team.all():
                 context['player_teams'].append((team, Player.objects.filter(team=team)))
 
         if self.request.user.is_staff:
@@ -34,25 +38,31 @@ class AccountBaseView(ULCBaseTemplateView):
 class RegistrationView(ULCBaseTemplateView):
     def get_context_data(self, **kwargs):
         context = super(RegistrationView, self).get_context_data(**kwargs)
-        context['team'] = RegistrationKeys.objects.get(key=self.request.GET.get('key')).inviter.player.all().first().team.all().first()
+        try:
+            context['team'] = RegistrationKeys.objects.get(key=self.request.GET.get('key')).inviter.player.team.all().first()
+        except:
+            context['team'] = None
         return context
 
 
 @csrf_exempt
 def invite_player(request):
-    player = Player.objects.get(user=request.user)
-    if player.is_captain:
+    try:
+        player = request.user.player
+    except:
+        player = None
+    if player and player.is_captain or request.user.is_staff:
         alphabet = string.ascii_uppercase + string.ascii_lowercase + string.digits
         key = ''.join(random.choice(alphabet) for _ in range(32))
         try:
             RegistrationKeys.objects.create(key=key,
-                                        inviter=request.user,
-                                        valid_date=now()+datetime.timedelta(days=1))
+                                            inviter=request.user,
+                                            valid_date=now()+datetime.timedelta(days=1))
         except Exception as e:
             print(e)
         return JsonResponse({'success': True, 'key': key}, status=200)
     else:
-        return JsonResponse({'success':False}, status=400)
+        return JsonResponse({'success': False}, status=400)
 
 
 @csrf_protect
@@ -86,14 +96,33 @@ def register_user(request):
     email = request.POST.get('email')
     first_name = request.POST.get('first_name')
     last_name = request.POST.get('last_name')
+    patronymic = request.POST.get('patronymic')
+    birthday = datetime.datetime.strptime(request.POST.get('birthday'), '%Y-%m-%d').date()
+    keyparam = re.search(r'\?key=\w+', request.POST.get('uri')).group(0).split('=')[-1]
+    key = RegistrationKeys.objects.get(key=keyparam)
+    try:
+        team = key.inviter.player.team
+    except Exception as e:
+        team = None
 
     try:
         user = User.objects.create_user(username, email, password)
     except Exception as e:
         return JsonResponse({'success': False}, status=400)
+
     user.first_name = first_name
     user.last_name = last_name
+
+    user.player.first_name = first_name
+    user.player.last_name = last_name
+    user.player.team.add = team
+    user.player.patronymic = patronymic
+    user.player.birthday = birthday
+
     user.save()
+
+    key.inactive = True
+    key.save()
     return JsonResponse({'success': True, 'redirect': '/account/{}'.format(user.id)}, status=200)
 
 

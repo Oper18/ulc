@@ -3,6 +3,8 @@
 from django.contrib import admin
 from django import forms
 
+from django.contrib.auth.models import User
+
 from championat.models import Season, League, Group, Team, Game, Championat, TimeSlot, DefaultTimeSlot
 from accounts.models import Player, RegistrationKeys
 
@@ -20,9 +22,15 @@ class LeagueAdmin(admin.ModelAdmin):
 admin.site.register(League, LeagueAdmin)
 
 
+class TeamInline(admin.TabularInline):
+    model = Team.group.through
+    extra = 6
+
+
 class GroupAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'league')
     list_filter = ('league',)
+    inlines = (TeamInline,)
 
 admin.site.register(Group, GroupAdmin)
 
@@ -31,12 +39,21 @@ class TeamAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
     list_filter = ('group',)
 
+    def get_form(self, request, obj=None, change=False, **kwargs):
+        form = super(TeamAdmin, self).get_form(request, obj, change, **kwargs)
+        form.base_fields['logo'].required = False
+
+        return form
+
 admin.site.register(Team, TeamAdmin)
 
 
 class GameAdmin(admin.ModelAdmin):
-    list_display = ('id', 'home', 'visitors', 'changed_at', 'group')
+    list_display = ('id', 'home', 'visitors', 'changed_at', 'group', 'score')
     list_filter = ('group', 'home', 'visitors')
+
+    def score(self, obj):
+        return '{} - {}'.format(obj.home_goals, obj.visitors_goals)
 
     def get_form(self, request, obj=None, change=False, **kwargs):
         form = super(GameAdmin, self).get_form(request, obj, change, **kwargs)
@@ -58,13 +75,22 @@ class PlayerAdmin(admin.ModelAdmin):
     list_filter = ('position', 'team')
 
     def name(self, obj):
-        return '{} {}'.format(obj.user.first_name, obj.user.last_name)
+        return '{} {} {}'.format(obj.user.first_name, obj.user.last_name, obj.patronymic)
 
     def get_form(self, request, obj=None, change=False, **kwargs):
         form = super(PlayerAdmin, self).get_form(request, obj, change, **kwargs)
         form.base_fields['logo'].required = False
 
         return form
+
+    def save_model(self, request, obj, form, change):
+        if obj.first_name and obj.first_name != obj.user.first_name:
+            obj.user.first_name = obj.first_name
+            obj.user.save()
+        if obj.last_name and obj.last_name != obj.user.last_name:
+            obj.user.last_name = obj.last_name
+            obj.user.save()
+        obj.save()
 
 admin.site.register(Player, PlayerAdmin)
 

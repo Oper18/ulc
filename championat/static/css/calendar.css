@@ -1,3 +1,7 @@
+.calendar-champ-header {
+    font-size: 1.5rem;
+}
+
 .acception {
     animation-iteration-count: 2;
     animation-duration: 2s;
@@ -46,6 +50,10 @@
 }
 
 @media screen and (max-width: 1024px) {
+    .calendar-champ-header {
+        font-size: 3.5rem;
+    }
+
     .group-btn {
         font-size: 3rem;
     }

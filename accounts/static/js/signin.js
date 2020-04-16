@@ -73,16 +73,18 @@ function Login(e) {
 function Signup(e) {
     if ($('#username-input-pg').hasClass('success-border') && $('#password-input-pg').hasClass('success-border') &&
         $('#email-input-pg').hasClass('success-border') && $('#firstname-input-pg').hasClass('success-border') &&
-        $('#lastname-input-pg').hasClass('success-border')) {
+        $('#lastname-input-pg').hasClass('success-border') && $('#patronymic-input-pg').hasClass('success-border')) {
 
         let username = $('#username-input-pg').val();
         let password = $('#password-input-pg').val();
         let email = $('#email-input-pg').val();
         let first_name = $('#firstname-input-pg').val();
         let last_name = $('#lastname-input-pg').val();
+        let patronymic = $('#patronymic-input-pg').val();
+        let birthday = $('#birthday-input-pg').val();
         let csrfmiddlewaretoken = $('[name=csrfmiddlewaretoken').val();
 
-        var data = {username, password, email, first_name, last_name, csrfmiddlewaretoken, 'uri': window.location.href};
+        var data = {username, password, email, first_name, last_name, patronymic, birthday, csrfmiddlewaretoken, 'uri': window.location.href};
 
         sendAJAX(data, '/ajax/registration/', e.target);
     }
@@ -170,6 +172,20 @@ function testSurname(e) {
 
 var debouncedSurname = _.debounce(testSurname, 500)
 
+function testPatronymic(e) {
+    var name = $('#patronymic-input-pg').val()
+    if (validateName(name) && name.length > 0) {
+        $('#patronymic-input-pg').removeClass('alert-border');
+        $('#patronymic-input-pg').addClass('success-border');
+    }
+    else {
+        $('#patronymic-input-pg').removeClass('success-border');
+        $('#patronymic-input-pg').addClass('alert-border');
+    }
+}
+
+var debouncedPatronymic = _.debounce(testPatronymic, 500)
+
 function testEmail(e) {
     var email = $('#email-input-pg').val()
     if (validateEmail(email) && email.length > 0) {
@@ -198,6 +214,20 @@ function testPassword(e) {
 
 var debouncedPassword = _.debounce(testPassword, 500)
 
+function testBirthday(e) {
+    var birthday = $('#birthday-input-pg').val()
+    if (birthday.length > 0) {
+        $('#birthday-input-pg').removeClass('alert-border');
+        $('#birthday-input-pg').addClass('success-border');
+    }
+    else {
+        $('#birthday-input-pg').removeClass('success-border');
+        $('#birthday-input-pg').addClass('alert-border');
+    }
+}
+
+var debouncedBirthday = _.debounce(testBirthday, 500)
+
 $(document).ready(function(){
     if ($('#signin-logo')) {
         $('#signin-logo').on('click', function(){
@@ -220,12 +250,15 @@ $(document).ready(function(){
         });
     }
 
-    if ($('#username-input-pg')[0] && $('#password-input-pg')[0] && $('#email-input-pg')[0] && $('#firstname-input-pg')[0] && $('#lastname-input-pg')[0]) {
+    if ($('#username-input-pg')[0] && $('#password-input-pg')[0] && $('#email-input-pg')[0] && $('#firstname-input-pg')[0] && $('#lastname-input-pg')[0]
+        && $('#patronymic-input-pg')[0]) {
         $('#username-input-pg')[0].addEventListener('input', debouncedUserName);
         $('#password-input-pg')[0].addEventListener('input', debouncedPassword);
         $('#email-input-pg')[0].addEventListener('input', debouncedEmail);
         $('#firstname-input-pg')[0].addEventListener('input', debouncedName);
         $('#lastname-input-pg')[0].addEventListener('input', debouncedSurname);
+        $('#patronymic-input-pg')[0].addEventListener('input', debouncedPatronymic);
+        $('#birthday-input-pg')[0].addEventListener('input', debouncedBirthday);
     }
 
     $('#signin-btn').on('click', Login);
