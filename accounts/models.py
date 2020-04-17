@@ -5,12 +5,12 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from championat.models import Team
+from championat.models import Team, Championat
 
 
 class Player(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    team = models.ManyToManyField(Team, verbose_name='Player\'s team')
+    team = models.ManyToManyField(Team, verbose_name='Player\'s team', through='PlayerCurrentTeam')
     position = models.CharField(verbose_name='Player\' position', max_length=128, null=True)
     is_captain = models.BooleanField(default=False)
     logo = models.ImageField(upload_to='players_logo', null=True)
@@ -43,3 +43,25 @@ def create_user_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     instance.player.save()
+
+
+class PlayerBid(models.Model):
+    player = models.ForeignKey(Player, related_name='player_bids', on_delete=models.CASCADE)
+    source_team = models.ForeignKey(Team, related_name='source_teams', on_delete=models.SET_NULL, null=True)
+    target_team = models.ForeignKey(Team, related_name='target_teams', on_delete=models.SET_NULL, null=True)
+    sended_date = models.DateTimeField(verbose_name='Team change bid date', auto_now_add=True)
+    accepted = models.BooleanField(verbose_name='Is bid accepted by captain', default=False)
+    declined = models.BooleanField(verbose_name='Is bid declined by captain', default=False)
+
+    def __str__(self):
+        return str(self.pk)
+
+
+class PlayerCurrentTeam(models.Model):
+    player = models.ForeignKey(Player, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    championat = models.ForeignKey(Championat, on_delete=models.SET_NULL, null=True)
+    current = models.BooleanField(verbose_name='Is team current', default=False)
+
+    def __str__(self):
+        return '{} - {}'.format(self.player.user.username, self.team.name)

@@ -14,13 +14,14 @@ from django.utils.timezone import now
 from django.core.exceptions import ObjectDoesNotExist
 
 from championat.views import ULCBaseTemplateView
-from accounts.models import Player, RegistrationKeys
+from accounts.models import Player, RegistrationKeys, PlayerCurrentTeam, PlayerBid
 from championat.models import Team, DefaultTimeSlot, TimeSlot, Championat, Season
 
 class AccountBaseView(ULCBaseTemplateView):
     def get_context_data(self, **kwargs):
         context = super(AccountBaseView, self).get_context_data(**kwargs)
         context['player_teams'] = []
+        context['current_player_teams'] = []
         try:
             player = self.request.user.player
         except:
@@ -28,6 +29,15 @@ class AccountBaseView(ULCBaseTemplateView):
         if not self.request.user.is_anonymous and player:
             for team in self.request.user.player.team.all():
                 context['player_teams'].append((team, Player.objects.filter(team=team)))
+
+            for team in PlayerCurrentTeam.objects.filter(player=self.request.user.player, current=True):
+                context['current_player_teams'].append((team, Team.objects.filter(group__in=team.team.group.all()),
+                                                        PlayerBid.objects.filter(source_team__in=player.team.all(), accepted=False, declined=False).exists()))
+
+            if not player.is_captain:
+                context['notifications'] = PlayerBid.objects.filter(source_team__in=player.team.all())
+            elif player.is_captain:
+                context['notifications'] = PlayerBid.objects.filter(target_team__in=player.team.all())
 
         if self.request.user.is_staff:
             context['championats'] = Championat.objects.filter(season__in=Season.objects.filter(year__gte=datetime.datetime.now().year))
@@ -171,3 +181,43 @@ def test_username(request):
     if user.exists():
         return JsonResponse({'success': True}, status=400)
     return JsonResponse({'success': True}, status=200)
+
+
+@csrf_protect
+def change_player_team(request):
+    if not request.user.is_anonymous and not request.user.player.is_captain:
+        source_team = request.POST.get('source_team')
+        target_team = request.POST.get('target_team')
+        player = request.user.player
+
+        PlayerBid.objects.create(player=player,
+                                 source_team=Team.objects.get(pk=source_team),
+                                 target_team=Team.objects.get(pk=target_team))
+
+        return JsonResponse({'success': True}, status=200)
+
+    if not request.user.is_anonymous and request.user.player.is_captain:
+        bid = PlayerBid.objects.get(pk=request.POST.get('bid'))
+        answer = request.POST.get('answer')
+
+        if answer == 'accept':
+            bid.accepted = True
+            bid.save()
+            try:
+                bid.player.team.add(bid.target_team)
+                bid.player.save()
+            except:
+                pass
+            pct_f = PlayerCurrentTeam.objects.filter(player=bid.player, team=bid.source_team, current=True).last()
+            pct_f.current = False
+            pct_f.save()
+            pct = PlayerCurrentTeam.objects.filter(player=bid.player, team=bid.target_team).order_by('id').last()
+            pct.current = True
+            pct.championat = pct_f.championat
+            pct.save()
+
+        elif answer == 'decline':
+            bid.declined = True
+            bid.save()
+
+        return JsonResponse({'success': True}, status=200)

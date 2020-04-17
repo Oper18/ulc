@@ -69,8 +69,31 @@
             </div>
         </div>
 
-    {% elif user.is_authenticated and user.player.all.first.is_captain %}
+    {% elif user.is_authenticated and user.player.is_captain %}
         <div class="account-info-left mobile-font-size">
+            {% if notifications.count > 0 %}
+            <a class="btn btn-primary group-btn" data-toggle="collapse" href="#notifications" role="button" aria-expanded="false">
+                Bids
+            </a>
+            <div class="collapse" id="notifications">
+                <ul class="list-group notifications-list">
+                    {% for notif in notifications %}
+                    <li class="list-group-item
+                            {% if not notif.accepted and not notif.declined %}list-group-item-secondary
+                            {% elif notif.accepted %}list-group-item list-group-item-success
+                            {% elif notif.declined %}list-group-item list-group-item-danger
+                            {% endif %}">
+                        {{ notif.source_team.name }} &#10132; {{ notif.target_team.name }}
+                        {% if not notif.accepted and not notif.declined %}
+                            <button id="accept-team-bid-{{ team.0.team.id }}" name="accept-bid-btn" type="button" class="btn btn-success btn-sm calendar-table accept-btn" data-target="{{ notif.id }}">&#10003;</button>
+                            <button id="decline-team-bid-{{ team.0.team.id }}" name="decline-bid-btn" type="button" class="btn btn-danger btn-sm calendar-table decline-btn" data-target="{{ notif.id }}">&#10008;</button>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
             {% for team in player_teams %}
                 <a class="btn btn-primary group-btn" data-toggle="collapse" href="#team{{ team.0.id }}" role="button" aria-expanded="false">
                     {{ team.0.name }}
@@ -106,8 +129,8 @@
                     <img src="{% static 'img/hool_logo.png' %}" class="card-img-top">
                 {% endif %}
                 <div class="card-body">
-                    {% for team in user.player.all.first.team.all %}
-                        <h5 class="card-title mobile-font-size-head">{{ team.name }}</h5>
+                    {% for team in current_player_teams %}
+                        <h5 class="card-title mobile-font-size-head">{{ team.0.championat.championat }}: {{ team.0.team.name }}</h5>
                     {% endfor %}
                     <p class="card-text">Some info will be here</p>
                     <button type="button" class="btn btn-success mobile-font-size" id="invite-btn-pg">Invite player</button>
@@ -116,20 +139,64 @@
                 </div>
             </div>
         </div>
-    {% elif user.is_authenticated and not user.player.all.first.is_captain %}
-        <div class="account-info-right">
-            <div class="card" style="width: 18rem;">
-                {% if user.player.all.first.logo %}
-                <img src="{{ user.player.all.first.logo.url }}" class="card-img-top">
+    {% elif user.is_authenticated and not user.player.is_captain %}
+        <div class="account-info-left mobile-font-size">
+            {% if notifications.count > 0 %}
+                <a class="btn btn-primary group-btn" data-toggle="collapse" href="#notifications" role="button" aria-expanded="false">
+                    Bids
+                </a>
+                <div class="collapse" id="notifications">
+                    <ul class="list-group notifications-list">
+                        {% for notif in notifications %}
+                        <li class="list-group-item
+                            {% if not notif.accepted and not notif.declined %}list-group-item-secondary
+                            {% elif notif.accepted %}list-group-item list-group-item-success
+                            {% elif notif.declined %}list-group-item list-group-item-danger
+                            {% endif %}">
+                            {{ notif.source_team.name }} &#10132; {{ notif.target_team.name }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="account-info-right mobile-font-size">
+            <div class="card"">
+                {% if user.player.logo %}
+                <img src="{{ user.player.logo.url }}" class="card-img-top">
                 {% else %}
                 <img src="{% static 'img/hool_logo.png' %}" class="card-img-top">
                 {% endif %}
                 <div class="card-body">
-                    {% for team in user.player.all.first.team.all %}
-                    <h5 class="card-title">{{ team.name }}</h5>
+                    {% for team in current_player_teams %}
+                    <h5 class="card-title mobile-font-size-head">
+                        <label>{{ team.0.championat.championat }}:</label>
+                        <button id="current-team-{{ team.0.team.id }}" type="button" class="btn btn-link btn-lg current-team mobile-font-size-head" data-target="{{ team.0.team.id }}"
+                            {% if team.2 %}disabled{% endif %}>{{ team.0.team.name }}</button>
+
+                        <div class="modal fade mobile-font-size" id="modal-teams-{{ team.0.team.id }}" tabindex="-1" role="dialog" aria-labelledby="modal-teams-{{ team.0.team.id }}-label" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <select id="choose-team-{{ team.0.team.id }}">
+                                            {% for team in team.1 %}
+                                            <option data-target="{{ team.id }}">{{ team.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button id="accept-team-{{ team.0.team.id }}" name="accept-changed-btn" type="button" class="btn btn-success btn-sm calendar-table accept-btn">&#10003;</button>
+                                        <button id="decline-team-{{ team.0.team.id }}" name="decline-changed-btn" type="button" class="btn btn-danger btn-sm calendar-table decline-btn">&#10008;</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </h5>
                     {% endfor %}
                     <p class="card-text">Some info will be here</p>
-                    <button type="button" class="btn btn-secondary" id="logout-btn-pg">Log Out</button>
+                    <button type="button" class="btn btn-secondary mobile-font-size" id="logout-btn-pg">Log Out</button>
                 </div>
             </div>
         </div>

@@ -5,8 +5,8 @@ from django import forms
 
 from django.contrib.auth.models import User
 
-from championat.models import Season, League, Group, Team, Game, Championat, TimeSlot, DefaultTimeSlot
-from accounts.models import Player, RegistrationKeys
+from championat.models import Season, League, Group, Team, Game, Championat, TimeSlot, DefaultTimeSlot, TeamBid
+from accounts.models import Player, RegistrationKeys, PlayerBid, PlayerCurrentTeam
 
 
 class SeasonAdmin(admin.ModelAdmin):
@@ -71,8 +71,14 @@ admin.site.register(Game, GameAdmin)
 
 
 class PlayerAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'position', 'number')
+    list_display = ('id', 'name', 'birthday', 'position', 'number')
     list_filter = ('position', 'team')
+
+    class TeamsInline(admin.TabularInline):
+        model = PlayerCurrentTeam
+        extra = 2
+
+    inlines = (TeamsInline,)
 
     def name(self, obj):
         return '{} {} {}'.format(obj.user.first_name, obj.user.last_name, obj.patronymic)
@@ -80,6 +86,9 @@ class PlayerAdmin(admin.ModelAdmin):
     def get_form(self, request, obj=None, change=False, **kwargs):
         form = super(PlayerAdmin, self).get_form(request, obj, change, **kwargs)
         form.base_fields['logo'].required = False
+        form.base_fields['number'].required = False
+        form.base_fields['position'].required = False
+        # form.base_fields['team'].required = False
 
         return form
 
@@ -120,3 +129,23 @@ class DefaultTimeSlotAdmin(admin.ModelAdmin):
     list_filter = ('day', 'championat')
 
 admin.site.register(DefaultTimeSlot, DefaultTimeSlotAdmin)
+
+
+class TeamBidAdmin(admin.ModelAdmin):
+    list_display = ('id', 'championat', 'team')
+    list_filter = ('championat', 'team')
+
+admin.site.register(TeamBid, TeamBidAdmin)
+
+
+class PlayerBidAdmin(admin.ModelAdmin):
+    list_display = ('id', 'player')
+    list_filter = ('player', 'source_team', 'target_team')
+
+admin.site.register(PlayerBid, PlayerBidAdmin)
+
+
+class PlayerTeamAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(PlayerCurrentTeam, PlayerTeamAdmin)

@@ -112,3 +112,18 @@ class Game(models.Model):
             raise FieldError
         else:
             super(Game, self).save_base(raw, force_insert, force_update, using, update_fields)
+
+
+class TeamBid(models.Model):
+    championat = models.ForeignKey(Championat, verbose_name='Team bid for championat', on_delete=models.SET_NULL, null=True, related_name='team_bids')
+    players = models.ManyToManyField('accounts.Player', verbose_name='Players in bid')
+    team = models.ForeignKey(Team, verbose_name='Team\' bid', on_delete=models.SET_NULL, null=True, related_name='team_bids')
+    sended = models.BooleanField(verbose_name='Is bid sended', default=False)
+    send_date = models.DateTimeField(verbose_name='Send bid date', auto_now_add=True)
+    accepted = models.BooleanField(verbose_name='Is bid accepted by admin', default=False)
+    accepted_date = models.DateTimeField(verbose_name='Send bid date', null=True)
+
+    def __str__(self):
+        champ = self.championat.championat if self.championat else self.pk
+        team = self.team.name if self.team else ''
+        return '{}, {}'.format(champ, team)

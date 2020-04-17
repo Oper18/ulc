@@ -19,6 +19,15 @@
     border-color: #28a745;
 }
 
+.current-team {
+    padding: 0;
+    margin-bottom: 0.2rem;
+}
+
+.notifications-list {
+    margin-bottom: 1rem;
+}
+
 @media screen and (max-width: 1024px) {
     .account-info-left {
         max-width: 100%;
