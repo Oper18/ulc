@@ -4,7 +4,7 @@ from django.urls import re_path
 from django.contrib.auth.decorators import login_required
 
 from accounts.views import AccountBaseView, ulc_login, RegistrationView, invite_player, check_registration_key, \
-    register_user, ulc_logout, test_username, change_player_team
+    register_user, ulc_logout, test_username, test_email, change_player_team
 
 
 urlpatterns = [
@@ -16,6 +16,7 @@ urlpatterns = [
     re_path(r'^ajax/invite/$', invite_player, name='ajax_invite'),
     re_path(r'^ajax/registration/$', register_user, name='ajax_register'),
     re_path(r'^ajax/testusername/$', test_username, name='ajax_testusername'),
+    re_path(r'^ajax/testemail/$', test_email, name='ajax_testemail'),
 
     re_path(r'^ajax/change_team/$', change_player_team, name='change_team'),
 

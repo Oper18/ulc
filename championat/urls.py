@@ -3,7 +3,8 @@
 from django.urls import re_path
 from django.contrib.auth.decorators import login_required
 
-from championat.views import ChampionatView, CalendarView, ULCBaseTemplateView, HistoryULCView, accept_changes, decline_changes
+from championat.views import ChampionatView, CalendarView, ULCBaseTemplateView, HistoryULCView, accept_changes, \
+    decline_changes, save_bid
 
 
 urlpatterns = [
@@ -45,4 +46,6 @@ urlpatterns = [
 
     re_path(r'^ajax/request/accept/$', accept_changes, name='game_changes_accpet'),
     re_path(r'^ajax/request/decline/$', decline_changes, name='game_changes_decline'),
+
+    re_path(r'^ajax/save_bid/$', save_bid, name='save_bid'),
 ]

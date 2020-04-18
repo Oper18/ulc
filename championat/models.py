@@ -20,6 +20,7 @@ class Championat(models.Model):
     championat = models.CharField(verbose_name='Championat\'s name', max_length=256)
     season = models.ForeignKey(Season, related_name='championats', on_delete=models.CASCADE, verbose_name='Championat\'s season', null=True)
     active = models.BooleanField(verbose_name='Running championat', default=False)
+    ended = models.BooleanField(verbose_name='Championat finished', default=False)
 
     def __str__(self):
         return self.championat
@@ -121,7 +122,7 @@ class TeamBid(models.Model):
     sended = models.BooleanField(verbose_name='Is bid sended', default=False)
     send_date = models.DateTimeField(verbose_name='Send bid date', auto_now_add=True)
     accepted = models.BooleanField(verbose_name='Is bid accepted by admin', default=False)
-    accepted_date = models.DateTimeField(verbose_name='Send bid date', null=True)
+    accepted_date = models.DateTimeField(verbose_name='Accept bid date', null=True)
 
     def __str__(self):
         champ = self.championat.championat if self.championat else self.pk

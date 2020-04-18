@@ -82,9 +82,12 @@ function Signup(e) {
         let last_name = $('#lastname-input-pg').val();
         let patronymic = $('#patronymic-input-pg').val();
         let birthday = $('#birthday-input-pg').val();
+        let card = $('#card-input-pg').val();
+        let vk = $('#vk-input-pg').val();
+        let inst = $('#inst-input-pg').val();
         let csrfmiddlewaretoken = $('[name=csrfmiddlewaretoken').val();
 
-        var data = {username, password, email, first_name, last_name, patronymic, birthday, csrfmiddlewaretoken, 'uri': window.location.href};
+        var data = {username, password, email, first_name, last_name, patronymic, birthday, card, vk, inst, csrfmiddlewaretoken, 'uri': window.location.href};
 
         sendAJAX(data, '/ajax/registration/', e.target);
     }
@@ -145,7 +148,7 @@ function testUserName(e) {
 var debouncedUserName = _.debounce(testUserName, 500)
 
 function testName(e) {
-    var name = $('#firstname-input-pg').val()
+    var name = $('#firstname-input-pg').val();
     if (validateName(name) && name.length > 0) {
         $('#firstname-input-pg').removeClass('alert-border');
         $('#firstname-input-pg').addClass('success-border');
@@ -159,7 +162,7 @@ function testName(e) {
 var debouncedName = _.debounce(testName, 500)
 
 function testSurname(e) {
-    var name = $('#lastname-input-pg').val()
+    var name = $('#lastname-input-pg').val();
     if (validateName(name) && name.length > 0) {
         $('#lastname-input-pg').removeClass('alert-border');
         $('#lastname-input-pg').addClass('success-border');
@@ -173,7 +176,7 @@ function testSurname(e) {
 var debouncedSurname = _.debounce(testSurname, 500)
 
 function testPatronymic(e) {
-    var name = $('#patronymic-input-pg').val()
+    var name = $('#patronymic-input-pg').val();
     if (validateName(name) && name.length > 0) {
         $('#patronymic-input-pg').removeClass('alert-border');
         $('#patronymic-input-pg').addClass('success-border');
@@ -187,14 +190,30 @@ function testPatronymic(e) {
 var debouncedPatronymic = _.debounce(testPatronymic, 500)
 
 function testEmail(e) {
-    var email = $('#email-input-pg').val()
-    if (validateEmail(email) && email.length > 0) {
-        $('#email-input-pg').removeClass('alert-border');
-        $('#email-input-pg').addClass('success-border');
-    }
-    else {
-        $('#email-input-pg').removeClass('success-border');
-        $('#email-input-pg').addClass('alert-border');
+    let email = $('#email-input-pg').val();
+    let csrfmiddlewaretoken = $('[name=csrfmiddlewaretoken').val();
+    var data = {email, csrfmiddlewaretoken};
+    if (email.length > 0 && validateEmail(email)) {
+        $.ajax({
+            beforeSend: function(xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+                }
+            },
+            url: '/ajax/testemail/',
+            type: 'POST',
+            data: data,
+            success: function(response) {
+                console.log(response);
+                $('#email-input-pg').removeClass('alert-border');
+                $('#email-input-pg').addClass('success-border');
+            },
+            error: function(response) {
+                console.log(response);
+                $('#email-input-pg').removeClass('success-border');
+                $('#email-input-pg').addClass('alert-border');
+            }
+        });
     }
 }
 
@@ -213,6 +232,48 @@ function testPassword(e) {
 }
 
 var debouncedPassword = _.debounce(testPassword, 500)
+
+function testCard(e) {
+    var card = $('#card-input-pg').val()
+    if (card.length > 0) {
+        $('#card-input-pg').removeClass('alert-border');
+        $('#card-input-pg').addClass('success-border');
+    }
+    else {
+        $('#card-input-pg').removeClass('success-border');
+        $('#card-input-pg').addClass('alert-border');
+    }
+}
+
+var debouncedCard = _.debounce(testCard, 500)
+
+function testVK(e) {
+    var vk = $('#vk-input-pg').val()
+    if (vk.length > 0) {
+        $('#vk-input-pg').removeClass('alert-border');
+        $('#vk-input-pg').addClass('success-border');
+    }
+    else {
+        $('#vk-input-pg').removeClass('success-border');
+        $('#vk-input-pg').addClass('alert-border');
+    }
+}
+
+var debouncedVK = _.debounce(testVK, 500)
+
+function testInst(e) {
+    var inst = $('#inst-input-pg').val()
+    if (inst.length > 0) {
+        $('#inst-input-pg').removeClass('alert-border');
+        $('#inst-input-pg').addClass('success-border');
+    }
+    else {
+        $('#inst-input-pg').removeClass('success-border');
+        $('#inst-input-pg').addClass('alert-border');
+    }
+}
+
+var debouncedInst = _.debounce(testInst, 500)
 
 function testBirthday(e) {
     var birthday = $('#birthday-input-pg').val()
@@ -251,7 +312,7 @@ $(document).ready(function(){
     }
 
     if ($('#username-input-pg')[0] && $('#password-input-pg')[0] && $('#email-input-pg')[0] && $('#firstname-input-pg')[0] && $('#lastname-input-pg')[0]
-        && $('#patronymic-input-pg')[0]) {
+        && $('#patronymic-input-pg')[0] && $('#birthday-input-pg')[0] && $('#card-input-pg')[0] && $('#vk-input-pg')[0] && $('#inst-input-pg')[0]) {
         $('#username-input-pg')[0].addEventListener('input', debouncedUserName);
         $('#password-input-pg')[0].addEventListener('input', debouncedPassword);
         $('#email-input-pg')[0].addEventListener('input', debouncedEmail);
@@ -259,6 +320,9 @@ $(document).ready(function(){
         $('#lastname-input-pg')[0].addEventListener('input', debouncedSurname);
         $('#patronymic-input-pg')[0].addEventListener('input', debouncedPatronymic);
         $('#birthday-input-pg')[0].addEventListener('input', debouncedBirthday);
+        $('#card-input-pg')[0].addEventListener('input', debounceCard);
+        $('#vk-input-pg')[0].addEventListener('input', debounceVK);
+        $('#inst-input-pg')[0].addEventListener('input', debounceInst);
     }
 
     $('#signin-btn').on('click', Login);

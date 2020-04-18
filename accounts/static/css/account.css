@@ -28,6 +28,11 @@
     margin-bottom: 1rem;
 }
 
+.bid-input {
+    background-color: #343a40;
+    color: #fff;
+}
+
 @media screen and (max-width: 1024px) {
     .account-info-left {
         max-width: 100%;
@@ -41,5 +46,17 @@
         width: 100%;
         display: block;
         float: left;
+    }
+
+    .mobile-modal {
+        max-width: 90%;
+    }
+
+    .bid-input {
+        font-size: 2rem;
+    }
+
+    .bid-checkbox {
+        transform: scale(3);
     }
 }

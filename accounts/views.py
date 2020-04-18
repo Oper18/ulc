@@ -108,6 +108,9 @@ def register_user(request):
     last_name = request.POST.get('last_name')
     patronymic = request.POST.get('patronymic')
     birthday = datetime.datetime.strptime(request.POST.get('birthday'), '%Y-%m-%d').date()
+    card = request.POST.get('card')
+    vk = request.POST.get('vk')
+    inst = request.POST.get('inst')
     keyparam = re.search(r'\?key=\w+', request.POST.get('uri')).group(0).split('=')[-1]
     key = RegistrationKeys.objects.get(key=keyparam)
     try:
@@ -128,6 +131,9 @@ def register_user(request):
     user.player.team.add = team
     user.player.patronymic = patronymic
     user.player.birthday = birthday
+    user.player.card = card
+    user.player.vk = vk
+    user.player.inst = inst
 
     user.save()
 
@@ -178,6 +184,14 @@ def create_default_slots(championat):
 @csrf_protect
 def test_username(request):
     user = User.objects.filter(username=request.POST.get('username'))
+    if user.exists():
+        return JsonResponse({'success': True}, status=400)
+    return JsonResponse({'success': True}, status=200)
+
+
+@csrf_protect
+def test_email(request):
+    user = User.objects.filter(email=request.POST.get('email'))
     if user.exists():
         return JsonResponse({'success': True}, status=400)
     return JsonResponse({'success': True}, status=200)

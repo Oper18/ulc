@@ -16,7 +16,8 @@ from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.http import JsonResponse
 from django.utils.timezone import now
 
-from championat.models import Season, League, Group, Team, Game, Championat, TimeSlot
+from championat.models import Season, League, Group, Team, Game, Championat, TimeSlot, TeamBid
+from accounts.models import PlayerCurrentTeam, Player
 
 
 logger = logging.getLogger(__name__)
@@ -251,3 +252,50 @@ def decline_changes(request):
             return JsonResponse({'success': False}, status=400)
         else:
             return JsonResponse({'success': True}, status=200)
+
+
+@csrf_protect
+def save_bid(request):
+    if request.user.player.is_captain:
+        bid_id = request.POST.get('bid')
+        championat_id = request.POST.get('championat')
+        players = []
+        for i in request.POST.keys():
+            if 'players' in i:
+                players.append(request.POST.getlist(i))
+        team_id = request.POST.get('team')
+        activity = request.POST.get('activity')
+
+        for player in players:
+            pl_team = PlayerCurrentTeam.objects.get(player=Player.objects.get(pk=player[0]),
+                                                    team=Team.objects.get(pk=team_id),
+                                                    championat=Championat.objects.get(pk=championat_id))
+            pl_team.position = player[1] if player[1] and player[1] != '' else pl_team.position
+            pl_team.number = int(player[2]) if player[2] and player[2] != '' else pl_team.number
+            pl_team.save()
+
+        if bid_id and bid_id != '':
+            bid = TeamBid.objects.get(pk=bid_id)
+            bid.championat = Championat.objects.get(pk=championat_id)
+            for pl in players:
+                if Player.objects.get(pk=pl[0]) in bid.players.all():
+                    bid.players.remove(Player.objects.get(pk=pl[0]))
+                else:
+                    bid.players.add(Player.objects.get(pk=pl[0]))
+            bid.team = Team.objects.get(pk=team_id)
+            bid.save()
+        else:
+            bid = TeamBid.objects.create(championat = Championat.objects.get(pk=championat_id),
+                                         team = Team.objects.get(pk=team_id))
+            for pl in players:
+                bid.players.add(Player.objects.get(pk=pl[0]))
+            bid.save()
+
+        if activity == 'send':
+            bid.sended = True
+            bid.send_date = now()
+            bid.save()
+
+        return JsonResponse({'success': True}, status=200)
+
+    return JsonResponse({'success': False}, status=400)

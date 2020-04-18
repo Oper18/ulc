@@ -4,6 +4,9 @@
 {% block head %}
 {{ block.super }}
     <link rel="stylesheet" href="{% static 'css/account.css' %}">
+    {% if user.player.is_captain %}
+        <script src="{% static 'js/send_bid.js' %}"></script>
+    {% endif %}
 {% endblock %}
 
 {% block body %}
@@ -105,18 +108,111 @@
                             <th scope="col" class="calendar-table">Player name</th>
                             <th scope="col" class="calendar-table">Player number</th>
                             <th scope="col" class="calendar-table">Position</th>
+                            <th scope="col" class="calendar-table">Birth date</th>
                         </tr>
                         </thead>
                         <tbody>
                         {% for player in team.1 %}
                             <tr>
-                                <th scope="row" class="calendar-table">{{ player.user.first_name }} {{ player.user.last_name }}</th>
-                                <td class="calendar-table" style="text-align: center">{{ player.number }}</td>
-                                <td class="calendar-table">{{ player.position }}</td>
+                                <th scope="row" class="calendar-table">{{ player.last_name }} {{ player.first_name }}</th>
+                                <td class="calendar-table" style="text-align: center">
+                                    {% for t in player.player_teams.all %}{% if t.team == team.0 %}{{ t.number }}{% endif %}{% endfor %}
+                                </td>
+                                <td class="calendar-table">
+                                    {% for t in player.player_teams.all %}{% if t.team == team.0 %}{{ t.position }}{% endif %}{% endfor %}
+                                </td>
+                                <td class="calendar-table">{{ player.birthday|date:'d.m.y' }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
                     </table>
+
+                    {% for group in team.0.group.all %}
+                        {% if not group.league.champ.active and not group.league.champ.ended %}
+                            <button type="button" class="btn btn-link mobile-font-size" data-toggle="modal" data-target="#bid-{{ group.league.championat.id }}">
+                                Create bid for {{ group.league.championat.championat }}
+                            </button>
+
+                            <div class="modal fade" id="bid-{{ group.league.championat.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog mobile-modal" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-body">
+                                            <table class="table table-dark" id="bid-table-{{ team.0.id }}">
+                                                <thead>
+                                                <tr>
+                                                    <th scope="col" class="calendar-table">Player name</th>
+                                                    <th scope="col" class="calendar-table">Player number</th>
+                                                    <th scope="col" class="calendar-table">Position</th>
+                                                    <th scope="col" class="calendar-table">Birth date</th>
+                                                    <th scope="col" class="calendar-table">Add</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for player in team.1 %}
+                                                <tr data-player="{{ player.id }}">
+                                                    <th scope="row" class="calendar-table">{{ player.last_name }} {{ player.first_name }} {{ player.patronymic }}</th>
+                                                    {% for t in player.player_teams.all %}{% if t.team == team.0 %}
+                                                        {% if t.number %}
+                                                            <td class="calendar-table" style="text-align: center"><span id="number-{{ team.0.id }}-{{ player.id }}">{{ t.number }}</span></td>
+                                                        {% else %}
+                                                            <td class="calendar-table" style="text-align: center">
+                                                                <input id="number-{{ team.0.id }}-{{ player.id }}" type="number" class="form-control bid-input" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm"
+                                                                    min="1" step="1" name="player-number">
+                                                            </td>
+                                                        {% endif %}
+                                                    {% endif %}{% endfor %}
+                                                    {% for t in player.player_teams.all %}{% if t.team == team.0 %}
+                                                        {% if t.position %}
+                                                            <td class="calendar-table"><span id="pos-{{ team.0.id }}-{{ player.id }}">{{ t.position }}</span></td>
+                                                        {% else %}
+                                                            <td class="calendar-table">
+                                                                <input id="pos-{{ team.0.id }}-{{ player.id }}" type="text" class="form-control bid-input" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm"
+                                                                       min="1" step="1" name="player-pos">
+                                                            </td>
+                                                        {% endif %}
+                                                    {% endif %}{% endfor %}
+                                                    <td class="calendar-table">{{ player.birthday|date:'d.m.y' }}</td>
+                                                    <td class="calendar-table" style="text-align:center">
+                                                        <input class="form-check-input bid-input bid-checkbox" type="checkbox" value="" id="checkbox-{{ team.0.id }}-{{ player.id }}"
+                                                               {% for t in player.player_teams.all %}{% if t.team == team.0 %}
+                                                                   {% if not t.number or not t.position %}disabled{% endif %}
+                                                               {% endif %}{% endfor %}
+                                                               {% for bid in group.league.championat.team_bids.all %}{% if bid.team == team.0 and player in bid.players.all %}
+                                                                   checked
+                                                               {% endif %}{% endfor %}
+                                                        >
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <span id="success-bid-{{ group.league.championat.id }}-{{ team.0.id }}" class="btn-success" style="display:none">&#10003;</span>
+                                            <span id="error-bid-{{ group.league.championat.id }}-{{ team.0.id }}" class="btn-danger" style="display:none">&#10008;</span>
+                                            <button id="send-bid-{{ group.league.championat.id }}-{{ team.0.id }}" name="send-bid-btn" type="button" class="btn btn-success btn-sm calendar-table accept-btn"
+                                                    data-team="{{ team.0.id }}"
+                                                    data-championat="{{ group.league.championat.id }}"
+                                                    data-bid="{% for bid in group.league.championat.team_bids.all %}{% if bid.team == team.0 %}{{ bid.id }}{% endif %}{% endfor %}"
+                                                    {% for bid in group.league.championat.team_bids.all %}{% if bid.team == team.0 and bid.sended %}
+                                                        disabled
+                                                    {% endif %}{% endfor %}
+                                            >Send bid</button>
+                                            <button id="save-bid-changes-{{ group.league.championat.id }}-{{ team.0.id }}" name="save-bid-btn" type="button" class="btn btn-warning btn-sm calendar-table decline-btn"
+                                                    data-team="{{ team.0.id }}"
+                                                    data-championat="{{ group.league.championat.id }}"
+                                                    data-bid="{% for bid in group.league.championat.team_bids.all %}{% if bid.team == team.0 %}{{ bid.id }}{% endif %}{% endfor %}"
+                                                    {% for bid in group.league.championat.team_bids.all %}{% if bid.team == team.0 and bid.sended %}
+                                                        disabled
+                                                    {% endif %}{% endfor %}
+                                            >Save bid</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+
                 </div>
             {% endfor %}
         </div>

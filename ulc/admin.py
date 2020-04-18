@@ -71,8 +71,8 @@ admin.site.register(Game, GameAdmin)
 
 
 class PlayerAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'birthday', 'position', 'number')
-    list_filter = ('position', 'team')
+    list_display = ('id', 'name', 'birthday')
+    list_filter = ('team',)
 
     class TeamsInline(admin.TabularInline):
         model = PlayerCurrentTeam
@@ -86,9 +86,6 @@ class PlayerAdmin(admin.ModelAdmin):
     def get_form(self, request, obj=None, change=False, **kwargs):
         form = super(PlayerAdmin, self).get_form(request, obj, change, **kwargs)
         form.base_fields['logo'].required = False
-        form.base_fields['number'].required = False
-        form.base_fields['position'].required = False
-        # form.base_fields['team'].required = False
 
         return form
 
@@ -111,7 +108,7 @@ admin.site.register(RegistrationKeys, RegistrationKeysAdmin)
 
 
 class ChampionatAdmin(admin.ModelAdmin):
-    list_display = ('id', 'championat')
+    list_display = ('id', 'championat', 'active', 'ended')
     list_filter = ('season',)
 
 admin.site.register(Championat, ChampionatAdmin)
