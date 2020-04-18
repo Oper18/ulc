@@ -129,8 +129,14 @@ admin.site.register(DefaultTimeSlot, DefaultTimeSlotAdmin)
 
 
 class TeamBidAdmin(admin.ModelAdmin):
-    list_display = ('id', 'championat', 'team')
-    list_filter = ('championat', 'team')
+    list_display = ('id', 'championat', 'team', 'sended', 'accepted', 'declined')
+    list_filter = ('championat', 'team', 'sended', 'accepted', 'declined')
+
+    def get_form(self, request, obj=None, change=False, **kwargs):
+        form = super(TeamBidAdmin, self).get_form(request, obj, change, **kwargs)
+        form.base_fields['accepted_date'].required = False
+
+        return form
 
 admin.site.register(TeamBid, TeamBidAdmin)
 

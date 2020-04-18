@@ -6,6 +6,8 @@
     <link rel="stylesheet" href="{% static 'css/account.css' %}">
     {% if user.player.is_captain %}
         <script src="{% static 'js/send_bid.js' %}"></script>
+    {% elif user.is_staff %}
+        <script src="{% static 'js/accept.js' %}"></script>
     {% endif %}
 {% endblock %}
 
@@ -25,6 +27,28 @@
         </form>
     {% elif user.is_staff %}
         <div class="account-info-left">
+
+            <a class="btn btn-primary group-btn" data-toggle="collapse" href="#notifications" role="button" aria-expanded="false">
+                Bids
+            </a>
+            <div class="collapse" id="notifications">
+                <ul class="list-group notifications-list">
+                    {% for notif in notifications %}
+                    <li class="list-group-item
+                            {% if not notif.accepted and not notif.declined %}list-group-item-secondary
+                            {% elif notif.accepted %}list-group-item list-group-item-success
+                            {% elif notif.declined %}list-group-item list-group-item-danger
+                            {% endif %}">
+                        {{ notif.team.name }} &#10132; {{ notif.championat.championat }}
+                        {% if not notif.accepted and not notif.declined and notif.sended %}
+                        <button id="accept-team-bid-{{ notif.id }}" name="accept-bid-btn" type="button" class="btn btn-success btn-sm calendar-table accept-btn" data-target="{{ notif.id }}">&#10003;</button>
+                        <button id="decline-team-bid-{{ notif.id }}" name="decline-bid-btn" type="button" class="btn btn-danger btn-sm calendar-table decline-btn" data-target="{{ notif.id }}">&#10008;</button>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
             {% for championat in championats %}
                 <a class="btn btn-primary group-btn" data-toggle="collapse" href="#championat-{{ championat.id }}" role="button" aria-expanded="false">
                     {{ championat.season.year }} - {{ championat.championat }}

@@ -122,6 +122,7 @@ class TeamBid(models.Model):
     sended = models.BooleanField(verbose_name='Is bid sended', default=False)
     send_date = models.DateTimeField(verbose_name='Send bid date', auto_now_add=True)
     accepted = models.BooleanField(verbose_name='Is bid accepted by admin', default=False)
+    declined = models.BooleanField(verbose_name='Is bid declined by admin', default=False)
     accepted_date = models.DateTimeField(verbose_name='Accept bid date', null=True)
 
     def __str__(self):

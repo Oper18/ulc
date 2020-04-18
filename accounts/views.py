@@ -15,7 +15,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from championat.views import ULCBaseTemplateView
 from accounts.models import Player, RegistrationKeys, PlayerCurrentTeam, PlayerBid
-from championat.models import Team, DefaultTimeSlot, TimeSlot, Championat, Season
+from championat.models import Team, DefaultTimeSlot, TimeSlot, Championat, Season, TeamBid
 
 class AccountBaseView(ULCBaseTemplateView):
     def get_context_data(self, **kwargs):
@@ -41,6 +41,7 @@ class AccountBaseView(ULCBaseTemplateView):
 
         if self.request.user.is_staff:
             context['championats'] = Championat.objects.filter(season__in=Season.objects.filter(year__gte=datetime.datetime.now().year))
+            context['notifications'] = TeamBid.objects.filter(sended=True, accepted=False)
 
         return context
 

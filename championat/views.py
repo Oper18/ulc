@@ -293,9 +293,30 @@ def save_bid(request):
 
         if activity == 'send':
             bid.sended = True
-            bid.send_date = now()
+            bid.send_date = datetime.datetime.now(pytz.timezone('Europe/Moscow'))
             bid.save()
 
         return JsonResponse({'success': True}, status=200)
 
     return JsonResponse({'success': False}, status=400)
+
+
+@csrf_protect
+def answer_bid(request):
+    if request.user.is_staff:
+        bid = request.POST.get('bid')
+        answer = request.POST.get('answer')
+
+        tb = TeamBid.objects.get(pk=bid)
+
+        if answer == 'accept':
+            tb.accepted = True
+            tb.accepted_date = datetime.datetime.now(pytz.timezone('Europe/Moscow'))
+            tb.save()
+
+        elif answer == 'decline':
+            tb.declined = True
+            tb.accepted_date = datetime.datetime.now(pytz.timezone('Europe/Moscow'))
+            tb.save()
+
+        return JsonResponse({'success': True}, status=200)
