@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import datetime
+import pytz
 
 from django.db import models
 from django.core.exceptions import FieldError
@@ -129,3 +130,29 @@ class TeamBid(models.Model):
         champ = self.championat.championat if self.championat else self.pk
         team = self.team.name if self.team else ''
         return '{}, {}'.format(champ, team)
+
+
+class SuspensionTeamGroup(models.Model):
+    team = models.ForeignKey(Team, verbose_name='Suspensioned team', related_name='suspensions', on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, verbose_name='Group of suspension', related_name='suspension_team', on_delete=models.CASCADE)
+    suspension = models.BooleanField(verbose_name='Suspensioned', default=True)
+
+    def __str__(self):
+        return '{} - {}'.format(self.team.name, self.group.name)
+
+    def save_base(self, raw=False, force_insert=False,
+                  force_update=False, using=None, update_fields=None):
+
+        if self.team and self.group and self.suspension:
+            for game in Game.objects.filter(home=self.team, group=self.group, off=False):
+                game.home_goals = 0
+                game.visitors_goals = 3
+                game.off = True
+                game.save()
+            for game in Game.objects.filter(visitors=self.team, group=self.group, off=False):
+                game.home_goals = 3
+                game.visitors_goals = 0
+                game.off = True
+                game.save()
+
+        super(SuspensionTeamGroup, self).save_base(raw, force_insert, force_update, using, update_fields)

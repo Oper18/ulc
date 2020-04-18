@@ -12,10 +12,11 @@ from django.contrib.auth.models import User
 from django.http import JsonResponse, HttpResponseForbidden
 from django.utils.timezone import now
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q, Count
 
 from championat.views import ULCBaseTemplateView
 from accounts.models import Player, RegistrationKeys, PlayerCurrentTeam, PlayerBid
-from championat.models import Team, DefaultTimeSlot, TimeSlot, Championat, Season, TeamBid
+from championat.models import Team, DefaultTimeSlot, TimeSlot, Championat, Season, TeamBid, SuspensionTeamGroup, Group
 
 class AccountBaseView(ULCBaseTemplateView):
     def get_context_data(self, **kwargs):
@@ -40,7 +41,11 @@ class AccountBaseView(ULCBaseTemplateView):
                 context['notifications'] = PlayerBid.objects.filter(target_team__in=player.team.all())
 
         if self.request.user.is_staff:
-            context['championats'] = Championat.objects.filter(season__in=Season.objects.filter(year__gte=datetime.datetime.now().year))
+            context['championats'] = []
+            for championat in Championat.objects.filter(season__in=Season.objects.filter(year__gte=datetime.datetime.now().year)):
+                context['championats'].append((championat,
+                                               Team.objects.filter(group__league__championat=championat).
+                                               annotate(ban=Count('suspensions', filter=Q(suspensions__group__league__championat=championat)))))
             context['notifications'] = TeamBid.objects.filter(sended=True, accepted=False)
 
         return context
@@ -234,5 +239,18 @@ def change_player_team(request):
         elif answer == 'decline':
             bid.declined = True
             bid.save()
+
+        return JsonResponse({'success': True}, status=200)
+
+
+@csrf_protect
+def suspens_team(request):
+    if request.user.is_staff:
+        team = request.POST.get('team')
+        group = request.POST.get('group')
+
+        SuspensionTeamGroup.objects.create(team=Team.objects.get(pk=team),
+                                           group=Group.objects.get(pk=group),
+                                           suspension=True)
 
         return JsonResponse({'success': True}, status=200)

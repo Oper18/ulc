@@ -26,7 +26,7 @@
             <input type="button" class="btn btn-primary mobile-font-size-head" id="signin-btn-pg" value="Вход">
         </form>
     {% elif user.is_staff %}
-        <div class="account-info-left">
+        <div class="account-info-left mobile-font-size">
 
             <a class="btn btn-primary group-btn" data-toggle="collapse" href="#notifications" role="button" aria-expanded="false">
                 Bids
@@ -50,10 +50,10 @@
             </div>
 
             {% for championat in championats %}
-                <a class="btn btn-primary group-btn" data-toggle="collapse" href="#championat-{{ championat.id }}" role="button" aria-expanded="false">
-                    {{ championat.season.year }} - {{ championat.championat }}
+                <a class="btn btn-primary group-btn" data-toggle="collapse" href="#championat-{{ championat.0.id }}" role="button" aria-expanded="false">
+                    {{ championat.0.season.year }} - {{ championat.0.championat }}
                 </a>
-                <div class="collapse" id="championat-{{ championat.id }}">
+                <div class="collapse" id="championat-{{ championat.0.id }}">
                     <table class="table table-dark">
                         <thead>
                         <tr>
@@ -63,7 +63,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% for slot in championat.default_slots.all %}
+                        {% for slot in championat.0.default_slots.all %}
                             <tr>
                                 <th>{{ slot.time }}</th>
                                 <th>{{ slot.day }}</th>
@@ -72,13 +72,43 @@
                         {% endfor %}
                         </tbody>
                     </table>
-                    <button type="button" class="btn btn-primary btn-sm">Create timeslots for next week</button>
+                    <button type="button" class="btn btn-primary btn-sm mobile-font-size-head" style="margin-bottom:1rem">Create timeslots for next week</button>
+
+                    <a class="btn btn-light group-btn" data-toggle="collapse" href="#teams-{{ championat.id }}" role="button" aria-expanded="false">
+                        Teams
+                    </a>
+                    <div class="collapse" id="teams-{{ championat.id }}">
+                        <table class="table table-dark">
+                            <thead>
+                            <tr>
+                                <th scope="col">Team</th>
+                                <th scope="col"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for team in championat.1 %}
+                                <tr>
+                                    <th>{{ team.name }}</th>
+                                    <th>
+                                        {% if team.ban == 0 %}
+                                        <button id="team-{{ team.id }}-{{ group.id }}" name="suspens-btn" type="button" class="btn btn-danger mobile-font-size">
+                                            Ban
+                                        </button>
+                                        {% else %}
+                                        <span class="btn-warning mobile-font-size">Baned</span>
+                                        {% endif %}
+                                    </th>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             {% endfor %}
         </div>
 
-        <div class="account-info-right">
-            <div class="card" style="width: 18rem;">
+        <div class="account-info-right mobile-font-size">
+            <div class="card">
                 {% if user.player.all.first.logo %}
                 <img src="{{ user.player.all.first.logo.url }}" class="card-img-top">
                 {% else %}
@@ -86,12 +116,12 @@
                 {% endif %}
                 <div class="card-body">
                     {% for team in user.player.all.first.team.all %}
-                    <h5 class="card-title">{{ team.name }}</h5>
+                    <h5 class="card-title mobile-font-size-head">{{ team.name }}</h5>
                     {% endfor %}
                     <p class="card-text">Some info will be here</p>
-                    <button type="button" class="btn btn-success" id="invite-btn-pg">Invite player</button>
-                    <button type="button" class="btn btn-secondary" id="logout-btn-pg">Log Out</button>
-                    <label id="invite-mes-label" class="form-text text-muted" style="display:none; color:#ff0000!important"></label>
+                    <button type="button" class="btn btn-success mobile-font-size-head" id="invite-btn-pg">Invite player</button>
+                    <button type="button" class="btn btn-secondary mobile-font-size-head" id="logout-btn-pg">Log Out</button>
+                    <label id="invite-mes-label" class="form-text text-muted mobile-font-size-head" style="display:none; color:#ff0000!important"></label>
                 </div>
             </div>
         </div>

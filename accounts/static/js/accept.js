@@ -46,11 +46,36 @@ function AnswerBid(e) {
     });
 }
 
+function SuspensTeam(e) {
+    let team = e.target.id.split('-')[1];
+    let group = e.target.id.split('-')[2];
+    let csrfmiddlewaretoken = $('[name=csrfmiddlewaretoken').val();
+
+    var data = {csrfmiddlewaretoken, team, group};
+    $.ajax({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+            }
+        },
+        url: '/ajax/suspens_team/',
+        type: 'POST',
+        data: data,
+        success: function(response) {
+            $('#' + e.target.id).attr('disabled', true);
+        }
+    });
+}
+
 $(document).ready(function(){
     for (i = 0; i < $('[name=accept-bid-btn]').length; i++) {
         $('[name=accept-bid-btn]')[i].addEventListener('click', AnswerBid);
     }
     for (i = 0; i < $('[name=decline-bid-btn]').length; i++) {
         $('[name=decline-bid-btn]')[i].addEventListener('click', AnswerBid);
+    }
+
+    for (i = 0; i < $('[name=suspens-btn]').length; i++) {
+        $('[name=suspens-btn]')[i].addEventListener('click', SuspensTeam);
     }
 })

@@ -5,7 +5,7 @@ from django import forms
 
 from django.contrib.auth.models import User
 
-from championat.models import Season, League, Group, Team, Game, Championat, TimeSlot, DefaultTimeSlot, TeamBid
+from championat.models import Season, League, Group, Team, Game, Championat, TimeSlot, DefaultTimeSlot, TeamBid, SuspensionTeamGroup
 from accounts.models import Player, RegistrationKeys, PlayerBid, PlayerCurrentTeam
 
 
@@ -152,3 +152,10 @@ class PlayerTeamAdmin(admin.ModelAdmin):
     pass
 
 admin.site.register(PlayerCurrentTeam, PlayerTeamAdmin)
+
+
+class SuspensionTeamGroupAdmin(admin.ModelAdmin):
+    list_display = ('id', 'team', 'group')
+    list_filter = ('team', 'group')
+
+admin.site.register(SuspensionTeamGroup, SuspensionTeamGroupAdmin)
