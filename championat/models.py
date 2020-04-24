@@ -79,7 +79,7 @@ class Group(models.Model):
 
 class Team(models.Model):
     name = models.CharField(verbose_name='Team name', max_length=255)
-    group = models.ManyToManyField(Group, related_name='group')
+    group = models.ManyToManyField(Group, related_name='teams')
     logo = models.ImageField(upload_to='team_logo', null=True)
 
     def __str__(self):
