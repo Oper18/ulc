@@ -3,6 +3,8 @@
 from django.contrib import admin
 from django import forms
 
+from django.contrib.admin.widgets import FilteredSelectMultiple
+
 from django.contrib.auth.models import User
 
 from championat.models import Season, League, Group, Team, Game, Championat, TimeSlot, DefaultTimeSlot, TeamBid, SuspensionTeamGroup
@@ -27,10 +29,43 @@ class TeamInline(admin.TabularInline):
     extra = 6
 
 
+class GroupAdminForm(forms.ModelForm):
+    teams = forms.ModelMultipleChoiceField(
+        queryset=Team.objects.all(),
+        required=False,
+        widget=FilteredSelectMultiple(
+            verbose_name='Teams',
+            is_stacked=False
+        )
+    )
+
+    class Meta:
+        model = Group
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super(GroupAdminForm, self).__init__(*args, **kwargs)
+
+        if self.instance:
+            self.fields['teams'].initial = self.instance.teams.all()
+
+    def save(self, commit=True):
+        group = super(GroupAdminForm, self).save(commit=False)
+
+        group.domains = self.cleaned_data['teams']
+
+        if commit:
+            group.save()
+            group.save_m2m()
+
+        return group
+
+
+
 class GroupAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'league')
     list_filter = ('league',)
-    inlines = (TeamInline,)
+    form = GroupAdminForm
 
 admin.site.register(Group, GroupAdmin)
 
@@ -38,6 +73,7 @@ admin.site.register(Group, GroupAdmin)
 class TeamAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
     list_filter = ('group',)
+    filter_horizontal = ('group',)
 
     def get_form(self, request, obj=None, change=False, **kwargs):
         form = super(TeamAdmin, self).get_form(request, obj, change, **kwargs)
