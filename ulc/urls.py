@@ -26,7 +26,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     re_path(r'^', include('accounts.urls'), name='accounts'),
     re_path(r'^', include('championat.urls'), name='championat'),
-    re_path(r'^contacts/$', ULCBaseTemplateView.as_view(template_name='contacts.html'))
+    re_path(r'^contacts/$', ULCBaseTemplateView.as_view(template_name='contacts.html')),
+    re_path(r'^', include('api.v1.urls'), name='api')
 ]
 
 if settings.DEBUG:

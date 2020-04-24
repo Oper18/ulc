@@ -24,7 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '9ocvrl3p0nn!7qt6r)x+o%q!l54#pte^h0qs)_+lbryc&ybo5_'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'accounts',
     'championat',
     'rest_framework',
+    'rest_framework.authtoken',
+    'api',
 ]
 
 MIDDLEWARE = [
@@ -81,7 +83,7 @@ WSGI_APPLICATION = 'ulc.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'ulc2',
+        'NAME': 'ulc',
         'USER': 'ulc',
         'PASSWORD': 'ulc',
         'HOST': 'ulc_db',
@@ -171,3 +173,13 @@ CELERY_RESULT_BACKEND = 'redis://ulc_redis/1'
 BROKER_URL = 'redis://ulc_redis/1'
 
 TIME_ZONE = 'Europe/Moscow'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication'
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+
+}
