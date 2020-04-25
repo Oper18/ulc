@@ -21,6 +21,13 @@ class LeagueAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'championat')
     list_filter = ('championat',)
 
+    def get_form(self, request, obj=None, change=False, **kwargs):
+        form = super(LeagueAdmin, self).get_form(request, obj, change, **kwargs)
+        form.base_fields['logo'].required = False
+
+        return form
+
+
 admin.site.register(League, LeagueAdmin)
 
 
