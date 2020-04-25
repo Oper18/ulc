@@ -15,7 +15,7 @@ from .views import *
 ulc_view = get_swagger_view(title='ULC API')
 
 urlpatterns = [
-    re_path(r'^swagger/$', ulc_view),
+    re_path(r'^api/docs/$', ulc_view),
     # path('', include(router.urls)),
     # re_path(r'^api/login/$', LoginView.as_view(), name='api_login'),
     re_path(r'^api/login/$', api_login, name='api_login'),

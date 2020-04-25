@@ -2,8 +2,6 @@
 
 from rest_framework import serializers
 
-from django.contrib.auth.models import User
-
 from championat.models import Season, Championat, DefaultTimeSlot, TimeSlot, League, Group, Team,\
     Game, TeamBid, SuspensionTeamGroup
 from accounts.models import Player, RegistrationKeys, PlayerBid, PlayerCurrentTeam
