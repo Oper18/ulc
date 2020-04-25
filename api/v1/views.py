@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import json
+import re
 
 from django.contrib.auth.models import User
 from django.http import JsonResponse
@@ -12,19 +13,31 @@ from rest_framework import viewsets
 
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 
-from .serializers import ChampionatSerializer, GroupSerializer, TeamSerializer
-from championat.models import Championat, Group, Team
+from .serializers import SeasonSerializer, ChampionatSerializer, DefaultTimeSlotSerializer, TimeSlotSerializer, \
+    LeagueSerializer, GroupSerializer, TeamSerializer, GameSerializer, TeamBidSerializer, SuspensionTeamGroupSerializer, \
+    PlayerCurrentTeamSerializer, PlayerSerializer, PlayerBidSerializer
+
+from championat.models import Season, Championat, DefaultTimeSlot, TimeSlot, League, Group, Team, \
+    Game, TeamBid, SuspensionTeamGroup
+from accounts.models import Player, RegistrationKeys, PlayerBid, PlayerCurrentTeam
 
 
 class TestView(viewsets.ModelViewSet):
-    # serializer_class = ChampionatSerializer
-    serializer_class = TeamSerializer
-    queryset = Team.objects.all()
+    """
+    This is test method where will be testing different serializers
+    GET - return all info about objects, ?pk=<id> - return info about choosen object
+    POST - create new object
+    PUT - /<pk> will update choosen object
+    DELETE - /<pk> will delete choosen object
+    """
+    serializer_class = PlayerSerializer
+    queryset = Player.objects.all()
     authentication_classes = [SessionAuthentication, BasicAuthentication, TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        pk = self.request.query_params.get('pk')
+        pk = re.search(r'[0-9]+', self.request.path)
+        pk = pk.group(0) if pk else None
         qs = super(TestView, self).get_queryset()
         return qs if not pk else qs.filter(pk=pk)
 

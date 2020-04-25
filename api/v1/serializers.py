@@ -2,6 +2,8 @@
 
 from rest_framework import serializers
 
+from django.contrib.auth.models import User
+
 from championat.models import Season, Championat, DefaultTimeSlot, TimeSlot, League, Group, Team,\
     Game, TeamBid, SuspensionTeamGroup
 from accounts.models import Player, RegistrationKeys, PlayerBid, PlayerCurrentTeam
@@ -15,6 +17,10 @@ class SeasonSerializer(serializers.ModelSerializer):
 
 
 class ChampionatSerializer(serializers.ModelSerializer):
+    league = serializers.SerializerMethodField()
+
+    def get_league(self, obj):
+        return [LeagueSerializer(l).data for l in obj.league.all()]
 
     class Meta:
         model = Championat
@@ -44,9 +50,13 @@ class LeagueSerializer(serializers.ModelSerializer):
 
 class GroupSerializer(serializers.ModelSerializer):
     championat = serializers.SerializerMethodField()
+    league = serializers.SerializerMethodField()
 
     def get_championat(self, obj):
         return ChampionatSerializer(obj.league.championat).data
+
+    def get_league(self, obj):
+        return LeagueSerializer(obj.league).data
 
     class Meta:
         model = Group
@@ -59,16 +69,10 @@ class TeamSerializer(serializers.ModelSerializer):
     group = serializers.SerializerMethodField()
 
     def get_league(self, obj):
-        leagues = []
-        for group in obj.group.all():
-            leagues.append(LeagueSerializer(group.league).data)
-        return leagues
+        return [LeagueSerializer(g.league).data for g in obj.group.all()]
 
     def get_championat(self, obj):
-        championats = []
-        for group in obj.group.all():
-            championats.append(ChampionatSerializer(group.league.championat).data)
-        return championats
+        return [ChampionatSerializer(g.league.championat).data for g in obj.group.all()]
 
     def get_group(self, obj):
         return [GroupSerializer(group).data for group in obj.group.all()]
@@ -78,22 +82,71 @@ class TeamSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'group', 'league', 'championat', 'logo']
 
 
-# class GameSerializer(serializers.ModelSerializer):
-#     home = serializers.SerializerMethodField()
-#     visitors = serializers.SerializerMethodField()
-#     game_date = serializers.SerializerMethodField()
-#     championat = serializers.SerializerMethodField()
-#     group = serializers.SerializerMethodField()
-#     # requester = serializers.SerializerMethodField()
-#     # answer = serializers.SerializerMethodField()
-#
-#     def get_home(self, obj):
-#         return TeamSerializer(obj.home).data
-#
-#     def get_visitors(self, obj):
-#         return TeamSerializer(obj.visitors).data
-#
-#     class Meta:
-#         model = Game
-#         fields = ['id', 'home', 'visitors', 'home_goals', 'visitors_goals', 'game_date', 'championat', 'off',
-#                   'group', 'tour', 'accepted_date', 'changed_at', 'requester', 'answer']
+class GameSerializer(serializers.ModelSerializer):
+    home = TeamSerializer()
+    visitors = TeamSerializer()
+    game_date = TimeSlotSerializer()
+    championat = ChampionatSerializer()
+    group = GroupSerializer()
+    # requester = serializers.SerializerMethodField()
+    # answer = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Game
+        fields = ['id', 'home', 'visitors', 'home_goals', 'visitors_goals', 'game_date', 'championat', 'off',
+                  'group', 'tour', 'accepted_date', 'changed_at', 'requester', 'answer']
+
+
+class TeamBidSerializer(serializers.ModelSerializer):
+    championat = ChampionatSerializer()
+    team = TeamSerializer()
+    # players = serializers.SerializerMethodField()
+
+    class Meta:
+        model = TeamBid
+        fields = ['id', 'championat', 'players', 'team', 'sended', 'send_date', 'accepted', 'declined', 'accepted_date']
+
+
+class SuspensionTeamGroupSerializer(serializers.ModelSerializer):
+    team = TeamSerializer()
+    group = GroupSerializer()
+
+    class Meta:
+        model = SuspensionTeamGroup
+        fields = ['id', 'team', 'group', 'suspension']
+
+
+class PlayerCurrentTeamSerializer(serializers.ModelSerializer):
+    team = TeamSerializer()
+    championat = ChampionatSerializer()
+
+    class Meta:
+        model = PlayerCurrentTeam
+        fields = ['id', 'player', 'team', 'championat', 'current', 'number', 'position']
+
+
+class PlayerSerializer(serializers.ModelSerializer):
+    teams = serializers.SerializerMethodField()
+    player_teams = PlayerCurrentTeamSerializer(many=True)
+    username = serializers.SerializerMethodField()
+
+    def get_teams(self, obj):
+        return [TeamSerializer(t).data for t in obj.team.all()]
+
+    def get_username(self, obj):
+        return obj.user.username
+
+    class Meta:
+        model = Player
+        fields = ['id', 'username', 'first_name', 'last_name', 'patronymic', 'teams', 'player_teams', 'is_captain', 'logo',
+                  'birthday', 'card_number', 'vk', 'inst']
+
+
+class PlayerBidSerializer(serializers.ModelSerializer):
+    player = PlayerSerializer()
+    source_team = TeamSerializer()
+    target_team = TeamSerializer()
+
+    class Meta:
+        model = PlayerBid
+        fields = ['id', 'player', 'source_team', 'target_team', 'sended_date', 'accepted', 'declined']
