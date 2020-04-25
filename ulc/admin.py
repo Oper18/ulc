@@ -21,6 +21,13 @@ class LeagueAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'championat')
     list_filter = ('championat',)
 
+    def get_form(self, request, obj=None, change=False, **kwargs):
+        form = super(LeagueAdmin, self).get_form(request, obj, change, **kwargs)
+        form.base_fields['logo'].required = False
+
+        return form
+
+
 admin.site.register(League, LeagueAdmin)
 
 
@@ -47,16 +54,19 @@ class GroupAdminForm(forms.ModelForm):
         super(GroupAdminForm, self).__init__(*args, **kwargs)
 
         if self.instance:
-            self.fields['teams'].initial = self.instance.teams.all()
+            try:
+                self.fields['teams'].initial = self.instance.teams.all()
+            except ValueError:
+                self.fields['teams'].initial = None
 
     def save(self, commit=True):
         group = super(GroupAdminForm, self).save(commit=False)
 
-        group.domains = self.cleaned_data['teams']
-
+        group.save()
         if commit:
-            group.save()
             group.save_m2m()
+
+        group.teams.set(self.cleaned_data['teams'])
 
         return group
 

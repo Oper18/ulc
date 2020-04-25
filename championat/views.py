@@ -41,8 +41,10 @@ class ULCBaseTemplateView(TemplateView):
         for g in Group.objects.filter(league__in=League.objects.filter(championat__in=
                                                                        Championat.objects.filter(season=
                                                                                                  Season.objects.get(year=datetime.datetime.now().year)))):
-            drop_item.append((g.league.name + g.name, '/league/' + re.sub(r' ', '_', g.league.name.lower()) +
-                              '/' + re.sub(r' ', '_', g.name) + '/' + str(g.league.championat.id)))
+            # drop_item.append((g.league.name + g.name, '/league/' + re.sub(r' ', '_', g.league.name.lower()) +
+            #                   '/' + re.sub(r' ', '_', g.name) + '/' + str(g.league.championat.id)))
+            drop_item.append((g.league.name + g.name, '/league/' + str(g.league.id) +
+                              '/' + str(g.id) + '/' + str(g.league.championat.id)))
 
         addition_navs = [(i[0], i[1]) for i in settings.ADDITION_DROP_NAVIGATION[context['navs'][0][0].encode('utf-8')]]
         context['navs'][0][1] = tuple(drop_item + addition_navs)
@@ -68,7 +70,7 @@ class ChampionatView(ULCBaseTemplateView):
         league = self.request.path.split('/')[2]
         group = self.request.path.split('/')[3]
         teams = []
-        for team in Team.objects.filter(group=Group.objects.get(name=group, league=League.objects.get(name=league))):
+        for team in Team.objects.filter(group=Group.objects.get(pk=group, league=League.objects.get(pk=league))):
             team_pos = {
                 'team': team,
                 'games': 0,
