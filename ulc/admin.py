@@ -62,11 +62,11 @@ class GroupAdminForm(forms.ModelForm):
     def save(self, commit=True):
         group = super(GroupAdminForm, self).save(commit=False)
 
-        group.teams.set(self.cleaned_data['teams'])
-
+        group.save()
         if commit:
-            group.save()
             group.save_m2m()
+
+        group.teams.set(self.cleaned_data['teams'])
 
         return group
 
