@@ -54,12 +54,15 @@ class GroupAdminForm(forms.ModelForm):
         super(GroupAdminForm, self).__init__(*args, **kwargs)
 
         if self.instance:
-            self.fields['teams'].initial = self.instance.teams.all()
+            try:
+                self.fields['teams'].initial = self.instance.teams.all()
+            except ValueError:
+                self.fields['teams'].initial = None
 
     def save(self, commit=True):
         group = super(GroupAdminForm, self).save(commit=False)
 
-        group.domains = self.cleaned_data['teams']
+        group.teams.set(self.cleaned_data['teams'])
 
         if commit:
             group.save()

@@ -70,7 +70,7 @@ class Group(models.Model):
     league = models.ForeignKey(League, on_delete=models.CASCADE, related_name='group')
 
     def __str__(self):
-        return '{}: {}-{}'.format(self.league.championat.championat, self.league.name, self.name)
+        return self.name
 
     @property
     def teams(self):
