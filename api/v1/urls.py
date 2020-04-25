@@ -32,5 +32,5 @@ urlpatterns = [
     })),
 
     re_path(r'api/test2/$', TestAPIView.as_view()),
-    re_path(r'api/league/[0-9]+/[0-9]+/[0-9]+/$', CalendarAPIView.as_view()),
+    re_path(r'api/league/[0-9]+/[0-9]+/[0-9]+/$', ChampionatAPIView.as_view()),
 ]

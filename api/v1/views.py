@@ -78,7 +78,7 @@ class TestAPIView(APIView):
         return Response({'success': 'return'})
 
 
-class CalendarAPIView(APIView):
+class ChampionatAPIView(APIView):
     """
     Get tournament table: /league/<league_pk>/<group_pk>/<championat_pk>/
     """
