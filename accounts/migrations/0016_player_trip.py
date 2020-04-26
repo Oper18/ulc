@@ -3,6 +3,12 @@
 from django.db import migrations, models
 
 
+def set_default(apps, schema_editor):
+    Player = apps.get_model('accounts', 'Player')
+    for player in Player.objects.all():
+        player.trips = 0
+        player.save()
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -15,4 +21,5 @@ class Migration(migrations.Migration):
             name='trip',
             field=models.IntegerField(default=0, verbose_name='Number of trips for FCLM'),
         ),
+        migrations.RunPython(set_default),
     ]
