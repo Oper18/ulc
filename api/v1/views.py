@@ -23,7 +23,7 @@ from championat.models import Season, Championat, DefaultTimeSlot, TimeSlot, Lea
     Game, TeamBid, SuspensionTeamGroup
 from accounts.models import Player, RegistrationKeys, PlayerBid, PlayerCurrentTeam
 
-from championat.views import ChampionatView
+from championat.views import ChampionatView, CalendarView
 
 
 class TestView(viewsets.ModelViewSet):
@@ -200,6 +200,40 @@ class ChampionatAPIView(APIView):
             i['team'] = TeamSerializer(i['team']).data
         return Response(context['table'])
 
+
+class CalendarAPIView(APIView):
+    """
+    Get calendar
+    """
+    authentication_classes = [SessionAuthentication, BasicAuthentication, TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        calendar = CalendarView()
+        request_copy = request
+        request_copy.path = re.sub(r'/api', '', request.path)
+        calendar.request = request_copy
+        context = calendar.get_context_data()
+
+        response = {}
+
+        response['teams'] = [TeamSerializer(i).data for i in context['teams']]
+
+        calendar = []
+        for champ in context['calendar']:
+            # calendar.append((ChampionatSerializer(champ[0]).data, ()))
+            l = []
+            for i in champ[1]:
+                l.append((LeagueSerializer(i[0]).data,
+                          GroupSerializer(i[1]).data,
+                          (GameSerializer(game).data for game in i[2]),
+                          (TimeSlotSerializer(ts).data for ts in i[3])))
+
+            calendar.append((ChampionatSerializer(champ[0]).data, l))
+
+        response['calendar'] = calendar
+
+        return Response(response)
 
 
 @csrf_exempt
