@@ -34,8 +34,8 @@ class TestView(viewsets.ModelViewSet):
     PUT - /<pk> will update choosen object
     DELETE - /<pk> will delete choosen object
     """
-    serializer_class = PlayerSerializer
-    queryset = Player.objects.all()
+    serializer_class = ChampionatSerializer
+    queryset = Championat.objects.all()
     authentication_classes = [SessionAuthentication, BasicAuthentication, TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -67,15 +67,120 @@ class TestAPIView(APIView):
         context = champ.get_context_data()
         for i in context['table']:
             i['team'] = TeamSerializer(i['team']).data
-        print('## ', context)
-        # return Response([ChampionatSerializer(championat).data for championat in Championat.objects.all()])
         return Response(context['table'])
 
     def post(self, request, *args, **kwargs):
-        print('# ', args)
-        print('## ', kwargs)
-        print('### ', request.data.keys())
         return Response({'success': 'return'})
+
+
+class ChampionatModelView(viewsets.ModelViewSet):
+    """
+    List championats, if not use <pk> in path usage of query params <eded=True/False> and <active=True/False> will filter result
+    """
+    serializer_class = ChampionatSerializer
+    queryset = Championat.objects.all()
+    authentication_classes = [SessionAuthentication, BasicAuthentication, TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        ended = self.request.query_params.get('ended')
+        active = self.request.query_params.get('active')
+
+        pk = re.search(r'[0-9]+', self.request.path)
+        pk = pk.group(0) if pk else None
+        qs = super(ChampionatModelView, self).get_queryset()
+
+        if ended and not pk:
+            qs = qs.filter(ended=ended)
+        if active and not pk:
+            qs = qs.filter(active=active)
+
+        return qs if not pk else qs.filter(pk=pk)
+
+
+class LeagueModelView(viewsets.ModelViewSet):
+    """
+    List leagues, if not use <pk> in path usage of query params <eded=True/False> and <active=True/False> will filter result
+    """
+    serializer_class = LeagueSerializer
+    queryset = League.objects.all()
+    authentication_classes = [SessionAuthentication, BasicAuthentication, TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        ended = self.request.query_params.get('ended')
+        active = self.request.query_params.get('active')
+
+        pk = re.search(r'[0-9]+', self.request.path)
+        pk = pk.group(0) if pk else None
+        qs = super(LeagueModelView, self).get_queryset()
+
+        if ended and not pk:
+            qs = qs.filter(championat__ended=ended)
+        if active and not pk:
+            qs = qs.filter(championat__active=active)
+
+        return qs if not pk else qs.filter(pk=pk)
+
+    def create(self, request, *args, **kwargs):
+        season = None
+        if request.data.get('season'):
+            season, created = Season.objects.get_or_create(year=request.data.get('season'))
+            season = season
+        if request.data.get('championat') and isinstance(request.data.get('championat'), str):
+            season = Season.objects.all().order_by('created_at').last() if not season else season
+            champ, created = Championat.objects.get_or_create(championat=request.data.get('championat'),
+                                                              season=season)
+            champ_id = champ.id
+            request.data['championat'] = champ_id
+            if 'season' in request.data: del request.data['season']
+        return super(LeagueModelView, self).create(request, *args, **kwargs)
+
+
+class GroupModelView(viewsets.ModelViewSet):
+    """
+    List groups, if not use <pk> in path usage of query params <eded=True/False> and <active=True/False> will filter result
+    """
+    serializer_class = GroupSerializer
+    queryset = Group.objects.all()
+    authentication_classes = [SessionAuthentication, BasicAuthentication, TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        ended = self.request.query_params.get('ended')
+        active = self.request.query_params.get('active')
+
+        pk = re.search(r'[0-9]+', self.request.path)
+        pk = pk.group(0) if pk else None
+        qs = super(GroupModelView, self).get_queryset()
+
+        if ended and not pk:
+            qs = qs.filter(league__championat__ended=ended)
+        if active and not pk:
+            qs = qs.filter(league__championat__active=active)
+
+        return qs if not pk else qs.filter(pk=pk)
+
+    def create(self, request, *args, **kwargs):
+        season = None
+        championat = None
+        if request.data.get('season'):
+            season, created = Season.objects.get_or_create(year=request.data.get('season'))
+            season = season
+        if request.data.get('championat') and isinstance(request.data.get('championat'), str):
+            season = Season.objects.all().order_by('created_at').last() if not season else season
+            championat, created = Championat.objects.get_or_create(championat=request.data.get('championat'),
+                                                                   season=season)
+            championat = championat
+        if request.data.get('league') and isinstance(request.data.get('league'), str):
+            championat = Championat.objects.all().order_by('season__created_at').last() if not championat else championat
+            league, created = League.objects.get_or_create(name=request.data.get('league'),
+                                                           championat=championat)
+            league_id = league.id
+            request.data['league'] = league_id
+            if 'season' in request.data: del request.data['season']
+            if 'championat' in request.data: del request.data['championat']
+        return super(GroupModelView, self).create(request, *args, **kwargs)
 
 
 class ChampionatAPIView(APIView):

@@ -17,7 +17,6 @@ ulc_view = get_swagger_view(title='ULC API')
 urlpatterns = [
     re_path(r'^api/docs/$', ulc_view),
     # path('', include(router.urls)),
-    # re_path(r'^api/login/$', LoginView.as_view(), name='api_login'),
     re_path(r'^api/login/$', api_login, name='api_login'),
 
     re_path(r'^api/test/$', TestView.as_view({
@@ -32,5 +31,39 @@ urlpatterns = [
     })),
 
     re_path(r'api/test2/$', TestAPIView.as_view()),
+
+    re_path(r'^api/championat/$', ChampionatModelView.as_view({
+        'get': 'list',
+        'post': 'create',
+    })),
+
+    re_path(r'^api/championat/(?P<pk>\d+)/$', ChampionatModelView.as_view({
+        'get': 'list',
+        'put': 'update',
+        'delete': 'destroy',
+    })),
+
+    re_path(r'^api/league/$', LeagueModelView.as_view({
+        'get': 'list',
+        'post': 'create',
+    })),
+
+    re_path(r'^api/league/(?P<pk>\d+)/$', LeagueModelView.as_view({
+        'get': 'list',
+        'put': 'update',
+        'delete': 'destroy',
+    })),
+
+    re_path(r'^api/group/$', GroupModelView.as_view({
+        'get': 'list',
+        'post': 'create',
+    })),
+
+    re_path(r'^api/group/(?P<pk>\d+)/$', GroupModelView.as_view({
+        'get': 'list',
+        'put': 'update',
+        'delete': 'destroy',
+    })),
+
     re_path(r'api/league/[0-9]+/[0-9]+/[0-9]+/$', ChampionatAPIView.as_view()),
 ]
