@@ -83,11 +83,12 @@ function Signup(e) {
         let patronymic = $('#patronymic-input-pg').val();
         let birthday = $('#birthday-input-pg').val();
         let card = $('#card-input-pg').val();
+        let trips = $('#trips-input-pg').val();
         let vk = $('#vk-input-pg').val();
         let inst = $('#inst-input-pg').val();
         let csrfmiddlewaretoken = $('[name=csrfmiddlewaretoken').val();
 
-        var data = {username, password, email, first_name, last_name, patronymic, birthday, card, vk, inst, csrfmiddlewaretoken, 'uri': window.location.href};
+        var data = {username, password, email, first_name, last_name, patronymic, birthday, card, trips, vk, inst, csrfmiddlewaretoken, 'uri': window.location.href};
 
         sendAJAX(data, '/ajax/registration/', e.target);
     }
