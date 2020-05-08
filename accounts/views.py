@@ -115,6 +115,7 @@ def register_user(request):
     patronymic = request.POST.get('patronymic')
     birthday = datetime.datetime.strptime(request.POST.get('birthday'), '%Y-%m-%d').date()
     card = request.POST.get('card')
+    trips = request.POST.get('trips') if request.POST.get('trips') else 0
     vk = request.POST.get('vk')
     inst = request.POST.get('inst')
     keyparam = re.search(r'\?key=\w+', request.POST.get('uri')).group(0).split('=')[-1]
@@ -138,6 +139,7 @@ def register_user(request):
     user.player.patronymic = patronymic
     user.player.birthday = birthday
     user.player.card = card
+    user.player.trip = trips
     user.player.vk = vk
     user.player.inst = inst
 

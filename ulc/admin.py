@@ -132,6 +132,9 @@ class PlayerAdmin(admin.ModelAdmin):
     def get_form(self, request, obj=None, change=False, **kwargs):
         form = super(PlayerAdmin, self).get_form(request, obj, change, **kwargs)
         form.base_fields['logo'].required = False
+        form.base_fields['vk'].required = False
+        form.base_fields['inst'].required = False
+        form.base_fields['card_number'].required = False
 
         return form
 

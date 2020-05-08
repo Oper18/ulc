@@ -21,6 +21,7 @@ class Player(models.Model):
     card_number = models.CharField(verbose_name='FCLM\'s card number (US/KK/ST)', default='-', max_length=128)
     vk = models.CharField(verbose_name='VK link', default='-', max_length=128)
     inst = models.CharField(verbose_name='Instagram link', default='-', max_length=128)
+    trip = models.IntegerField(verbose_name='Number of trips for FCLM', default=0)
 
     def __str__(self):
         return self.user.username
