@@ -21,12 +21,12 @@ urlpatterns = [
 
     re_path(r'^api/test/$', TestView.as_view({
         'get': 'list',
-        'post': 'create',
+        'put': 'create',
     })),
 
     re_path(r'^api/test/(?P<pk>\d+)/$', TestView.as_view({
         'get': 'list',
-        'put': 'update',
+        'post': 'update',
         'delete': 'destroy',
     })),
 
@@ -34,37 +34,38 @@ urlpatterns = [
 
     re_path(r'^api/championat/$', ChampionatModelView.as_view({
         'get': 'list',
-        'post': 'create',
+        'put': 'create',
     })),
 
     re_path(r'^api/championat/(?P<pk>\d+)/$', ChampionatModelView.as_view({
         'get': 'list',
-        'put': 'update',
+        'post': 'update',
         'delete': 'destroy',
     })),
 
     re_path(r'^api/league/$', LeagueModelView.as_view({
         'get': 'list',
-        'post': 'create',
+        'put': 'create',
     })),
 
     re_path(r'^api/league/(?P<pk>\d+)/$', LeagueModelView.as_view({
         'get': 'list',
-        'put': 'update',
+        'post': 'update',
         'delete': 'destroy',
     })),
 
     re_path(r'^api/group/$', GroupModelView.as_view({
         'get': 'list',
-        'post': 'create',
+        'put': 'create',
     })),
 
     re_path(r'^api/group/(?P<pk>\d+)/$', GroupModelView.as_view({
         'get': 'list',
-        'put': 'update',
+        'post': 'update',
         'delete': 'destroy',
     })),
 
     re_path(r'api/league/[0-9]+/[0-9]+/[0-9]+/$', ChampionatAPIView.as_view()),
     re_path(r'api/calendar/$', CalendarAPIView.as_view()),
+    # re_path(r'api/history/$', HistoryAPIView.as_view()),
 ]

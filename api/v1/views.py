@@ -224,9 +224,7 @@ class CalendarAPIView(APIView):
             # calendar.append((ChampionatSerializer(champ[0]).data, ()))
             l = []
             for i in champ[1]:
-                l.append((LeagueSerializer(i[0]).data,
-                          GroupSerializer(i[1]).data,
-                          (GameSerializer(game).data for game in i[2]),
+                l.append(((GameSerializer(game).data for game in i[2]),
                           (TimeSlotSerializer(ts).data for ts in i[3])))
 
             calendar.append((ChampionatSerializer(champ[0]).data, l))
@@ -234,6 +232,15 @@ class CalendarAPIView(APIView):
         response['calendar'] = calendar
 
         return Response(response)
+
+    def post(self, request, format=None):
+        if request.user.is_staff:
+            game = Game.objects.get(pk=request.data.get('game_id'))
+            timeslot = TimeSlot.objects.get(pk=request.data.get('ts_id')) if request.data.get('ts_id') else None
+            if timeslot:
+                game.game_date = timeslot
+                game.save()
+        return Response({})
 
 
 @csrf_exempt
