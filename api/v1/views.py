@@ -240,7 +240,60 @@ class CalendarAPIView(APIView):
             if timeslot:
                 game.game_date = timeslot
                 game.save()
-        return Response({})
+            return Response(GameSerializer(game).data)
+        if request.user.player.is_captain:
+            game = Game.objects.get(pk=request.data.get('game_id'))
+            timeslot = TimeSlot.objects.get(pk=request.data.get('ts_id')) if request.data.get('ts_id') else None
+            if timeslot and not game.accepted_date:
+                game.game_date = timeslot
+                game.save()
+            return Response(GameSerializer(game).data)
+        return Response({'message': 'No permissions'})
+
+
+class HistoryAPIView(APIView):
+
+    def get(self, request, format=None):
+        response = {'champs': []}
+        for champ in Championat.objects.all():
+            if champ.ended:
+                winners = self.get_league_winner(champ)
+            else:
+                winners = None
+            response['champs'].append(ChampionatSerializer(champ).data, winners)
+
+        return Response(response)
+
+    def post(self, request, format=None):
+        return Response({'message': 'Method not allowed'})
+
+    def get_league_winner(self, champ):
+        res = {}
+        for l in champ.league.all():
+            res[l.name] = {}
+            for g in l.group.all():
+                winner = None
+                for team in Team.objects.filter(group=g):
+                    winner_points = 0
+                    for game in Game.objects.filter(group=g, home=team):
+                        if game.home_goals > game.visitors_goals:
+                            winner_points += 3
+                        elif game.home_goals == game.visitors_goals:
+                            winner_points += 1
+                    for game in Game.objects.filter(group=g, visitors=team):
+                        if game.home_goals < game.visitors_goals:
+                            winner_points += 3
+                        elif game.home_goals == game.visitors_goals:
+                            winner_points += 1
+                    if not winner:
+                        winner = (team, winner_points)
+                    else:
+                        if winner[1] < winner_points:
+                            winner = (team, winner_points)
+
+                res[l.name][g.name] = winner
+
+        return res
 
 
 @csrf_exempt
