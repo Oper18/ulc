@@ -33,6 +33,16 @@
     height: 30px;
 }
 
+.ulc-footer {
+    background-color: #28a745;
+}
+
+.footer-copyright {
+    color: #fff;
+    text-align: right;
+    margin-right: 1rem;
+}
+
 @media screen and (max-width: 1024px) {
     .mainworkspace {
         width: 100%
@@ -85,5 +95,9 @@
     .signin-logo {
         width: 180px;
         height: 150px;
+    }
+
+    .ulc-footer {
+        font-size: 2rem;
     }
 }
