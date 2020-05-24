@@ -67,5 +67,5 @@ urlpatterns = [
 
     re_path(r'api/league/[0-9]+/[0-9]+/[0-9]+/$', ChampionatAPIView.as_view()),
     re_path(r'api/calendar/$', CalendarAPIView.as_view()),
-    # re_path(r'api/history/$', HistoryAPIView.as_view()),
+    re_path(r'api/history/$', HistoryAPIView.as_view()),
 ]

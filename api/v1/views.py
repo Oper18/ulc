@@ -260,7 +260,7 @@ class HistoryAPIView(APIView):
                 winners = self.get_league_winner(champ)
             else:
                 winners = None
-            response['champs'].append(ChampionatSerializer(champ).data, winners)
+            response['champs'].append((ChampionatSerializer(champ).data, winners))
 
         return Response(response)
 
