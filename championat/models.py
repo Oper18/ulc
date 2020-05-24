@@ -62,7 +62,7 @@ class League(models.Model):
     logo = models.ImageField(upload_to='league_logo', null=True)
 
     def __str__(self):
-        return self.name
+        return '{}-{}'.format(self.championat.championat, self.name)
 
 
 class Group(models.Model):
@@ -70,7 +70,7 @@ class Group(models.Model):
     league = models.ForeignKey(League, on_delete=models.CASCADE, related_name='group')
 
     def __str__(self):
-        return self.name
+        return '{}-{}-{}'.format(self.league.championat.championat, self.league.name, self.name)
 
     @property
     def teams(self):

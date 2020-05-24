@@ -321,9 +321,9 @@ $(document).ready(function(){
         $('#lastname-input-pg')[0].addEventListener('input', debouncedSurname);
         $('#patronymic-input-pg')[0].addEventListener('input', debouncedPatronymic);
         $('#birthday-input-pg')[0].addEventListener('input', debouncedBirthday);
-        $('#card-input-pg')[0].addEventListener('input', debounceCard);
-        $('#vk-input-pg')[0].addEventListener('input', debounceVK);
-        $('#inst-input-pg')[0].addEventListener('input', debounceInst);
+        $('#card-input-pg')[0].addEventListener('input', debouncedCard);
+        $('#vk-input-pg')[0].addEventListener('input', debouncedVK);
+        $('#inst-input-pg')[0].addEventListener('input', debouncedInst);
     }
 
     $('#signin-btn').on('click', Login);

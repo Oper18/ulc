@@ -64,12 +64,19 @@ class PlayerBid(models.Model):
 
 
 class PlayerCurrentTeam(models.Model):
+    POSITION_CHOICES = (
+        ('ВРТ', 'GK'),
+        ('ЗАШ', 'DEF'),
+        ('ПЗЩ', 'MID'),
+        ('НАП', 'FRW'),
+    )
+
     player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='player_teams')
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='player_teams')
     championat = models.ForeignKey(Championat, on_delete=models.SET_NULL, null=True)
     current = models.BooleanField(verbose_name='Is team current', default=False)
     number = models.IntegerField(verbose_name='Player number', null=True)
-    position = models.CharField(verbose_name='Player\' position', max_length=128, null=True)
+    position = models.CharField(verbose_name='Player\' position', max_length=128, choices=POSITION_CHOICES, null=True)
 
     def __str__(self):
         return '{} - {}'.format(self.player.user.username, self.team.name)
