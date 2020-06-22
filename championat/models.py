@@ -62,7 +62,7 @@ class League(models.Model):
     logo = models.ImageField(upload_to='league_logo', null=True)
 
     def __str__(self):
-        return '{}-{}'.format(self.championat.championat, self.name)
+        return '{}-{}'.format(self.pk, self.name)
 
 
 class Group(models.Model):
@@ -70,7 +70,7 @@ class Group(models.Model):
     league = models.ForeignKey(League, on_delete=models.CASCADE, related_name='group')
 
     def __str__(self):
-        return '{}-{}-{}'.format(self.league.championat.championat, self.league.name, self.name)
+        return '{}-{}-{}'.format(self.pk, self.name, str(self.league))
 
     @property
     def teams(self):
@@ -102,7 +102,7 @@ class Game(models.Model):
     answer = models.ForeignKey(User, verbose_name='Answer request', related_name='answer', on_delete=models.CASCADE, null=True)
 
     def __str__(self):
-        return self.home.name + '-' + self.visitors.name
+        return str(self.home) + '-' + str(self.visitors)
 
     @property
     def check_date(self):
@@ -138,7 +138,7 @@ class SuspensionTeamGroup(models.Model):
     suspension = models.BooleanField(verbose_name='Suspensioned', default=True)
 
     def __str__(self):
-        return '{} - {}'.format(self.team.name, self.group.name)
+        return '{} - {}'.format(str(self.team), str(self.group))
 
     def save_base(self, raw=False, force_insert=False,
                   force_update=False, using=None, update_fields=None):
