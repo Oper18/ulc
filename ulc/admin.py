@@ -98,6 +98,7 @@ class GroupAdmin(admin.ModelAdmin):
                 if obj.league.championat == g.league.championat:
                     messages.add_message(request, messages.ERROR, 'Not allowed many groups from one championat for team: {}'.format(team.name))
                     return
+            team.group.add(obj)
 
         self.check_related = True
 
@@ -115,8 +116,12 @@ class GroupAdmin(admin.ModelAdmin):
         object_id = re.sub('/', '', id.group(0)) if id else None
         TO_FIELD_VAR = '_to_field'
         to_field = request.POST.get(TO_FIELD_VAR, request.GET.get(TO_FIELD_VAR))
-        obj = self.get_object(request, unquote(object_id), to_field)
-        self.teams = self.list_diff(list(form.cleaned_data.get('teams')), [team.team for team in obj.teams.through.objects.filter(group=obj)])
+        try:
+            obj = self.get_object(request, unquote(object_id), to_field)
+        except:
+            pass
+        else:
+            self.teams = self.list_diff(list(form.cleaned_data.get('teams')), [team.team for team in obj.teams.through.objects.filter(group=obj)])
         return super(GroupAdmin, self).save_form(request, form, change)
 
     def message_user(self, request, message, level=messages.INFO, extra_tags='',
