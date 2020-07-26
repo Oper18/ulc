@@ -49,6 +49,40 @@
     margin:auto;
 }
 
+.rules {
+    text-align: center;
+    font-weight: 800;
+}
+ol {
+    counter-reset: item
+}
+li {
+    display: block
+}
+li:before {
+    content: counters(item, ".") " ";
+    counter-increment: item;
+}
+.sublist li::before {
+    content: "- ";
+}
+.head-number li:before {
+    font-size: 1em;
+    font-weight: 800;
+}
+.head-number{
+    font-size: 1.3em;
+    font-weight: 800;
+}
+.insert-number li:before {
+    font-size: 1em;
+    font-weight: 400;
+}
+.insert-number {
+    font-size: 1em;
+    font-weight: 400;
+}
+
 @media screen and (max-width: 1024px) {
     .calendar-champ-header {
         font-size: 3.5rem;
@@ -83,5 +117,8 @@
         width:50px;
         display:inline-block;
         margin:auto;
+    }
+    .head-number{
+        font-size: 3.0em;
     }
 }

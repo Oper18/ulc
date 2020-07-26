@@ -82,7 +82,7 @@ class ChampionatView(ULCBaseTemplateView):
                 'dif': 0,
                 'points': 0,
             }
-            for game in Game.objects.filter(home=team, off=True):
+            for game in Game.objects.filter(home=team, off=True, group__isnull=False):
                 team_pos['games'] += 1
                 team_pos['rifl'] += game.home_goals
                 team_pos['concede'] += game.visitors_goals
@@ -92,7 +92,7 @@ class ChampionatView(ULCBaseTemplateView):
                     team_pos['loses'] += 1
                 else:
                     team_pos['drawn'] += 1
-            for game in Game.objects.filter(visitors=team, off=True):
+            for game in Game.objects.filter(visitors=team, off=True, group__isnull=False):
                 team_pos['games'] += 1
                 team_pos['rifl'] += game.visitors_goals
                 team_pos['concede'] += game.home_goals
