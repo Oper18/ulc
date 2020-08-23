@@ -11,11 +11,11 @@
 {% for champ in calendar %}
     <h1 class="calendar-champ-header">{{ champ.0.championat }}</h1>
     {% for event in champ.1 %}
-        <a class="btn btn-primary group-btn" data-toggle="collapse" href="#calendar{{ event.0.name }}{{ event.1.name }}" role="button" aria-expanded="false" aria-controls="collapseExample">
+        <a class="btn btn-primary group-btn" data-toggle="collapse" href="#calendar{{ event.0.id }}{{ event.1.id }}" role="button" aria-expanded="false" aria-controls="collapseExample">
             {{ event.0.name }}{{ event.1.name }}
         </a>
 
-        <div class="collapse" id="calendar{{ event.0.name }}{{ event.1.name }}">
+        <div class="collapse" id="calendar{{ event.0.id }}{{ event.1.id }}">
             <div class="card card-body">
                 <table class="table table-dark table-borderless" id="event-{{ event.0.id }}{{ event.1.id }}">
                     <tbody>

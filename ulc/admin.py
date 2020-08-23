@@ -1,9 +1,14 @@
 # coding: utf-8
 
-from django.contrib import admin
+import re
+
+from django.contrib import admin, messages
 from django import forms
 
+from django.contrib.admin.utils import unquote
 from django.contrib.admin.widgets import FilteredSelectMultiple
+
+from django.core.exceptions import PermissionDenied
 
 from django.contrib.auth.models import User
 
@@ -60,22 +65,69 @@ class GroupAdminForm(forms.ModelForm):
                 self.fields['teams'].initial = None
 
     def save(self, commit=True):
-        group = super(GroupAdminForm, self).save(commit=False)
+        if GroupAdmin.check_related:
+            group = super(GroupAdminForm, self).save(commit=False)
 
-        group.save()
-        if commit:
-            group.save_m2m()
+            group.save()
+            if commit:
+                group.save_m2m()
 
-        group.teams.set(self.cleaned_data['teams'])
+            group.teams.set(self.cleaned_data['teams'])
 
-        return group
+            return group
+        return self.instance
 
+    def save_m2m(self):
+        return
 
 
 class GroupAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'league')
     list_filter = ('league',)
     form = GroupAdminForm
+    check_related = False
+    teams = []
+
+    def list_diff(self, first, second):
+        second = set(second)
+        return [item for item in first if item not in second]
+
+    def save_model(self, request, obj, form, change):
+        for team in self.teams:
+            for g in team.group.all():
+                if obj.league.championat == g.league.championat:
+                    messages.add_message(request, messages.ERROR, 'Not allowed many groups from one championat for team: {}'.format(team.name))
+                    return
+            team.group.add(obj)
+
+        self.check_related = True
+
+        if self.check_related:
+            super(GroupAdmin, self).save_model(request, obj, form, change)
+        else:
+            messages.add_message(request, messages.ERROR, 'Not allowed many groups from one championat')
+
+    def save_related(self, request, form, formsets, change):
+        if self.check_related:
+            super(GroupAdmin, self).save_related(request, form, formsets, change)
+
+    def save_form(self, request, form, change):
+        id = re.search(r'/[0-9]+/', request.path)
+        object_id = re.sub('/', '', id.group(0)) if id else None
+        TO_FIELD_VAR = '_to_field'
+        to_field = request.POST.get(TO_FIELD_VAR, request.GET.get(TO_FIELD_VAR))
+        try:
+            obj = self.get_object(request, unquote(object_id), to_field)
+        except:
+            pass
+        else:
+            self.teams = self.list_diff(list(form.cleaned_data.get('teams')), [team.team for team in obj.teams.through.objects.filter(group=obj)])
+        return super(GroupAdmin, self).save_form(request, form, change)
+
+    def message_user(self, request, message, level=messages.INFO, extra_tags='',
+                     fail_silently=False):
+        if self.check_related:
+            super(GroupAdmin, self).message_user(request, message, level, extra_tags, fail_silently)
 
 admin.site.register(Group, GroupAdmin)
 
@@ -84,12 +136,42 @@ class TeamAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
     list_filter = ('group',)
     filter_horizontal = ('group',)
+    check_related = False
 
     def get_form(self, request, obj=None, change=False, **kwargs):
         form = super(TeamAdmin, self).get_form(request, obj, change, **kwargs)
         form.base_fields['logo'].required = False
 
         return form
+
+    def save_model(self, request, obj, form, change):
+        groups = []
+        groups.extend(form.cleaned_data.get('group'))
+        groups.extend(list(obj.group.all()))
+        for g1 in set(groups):
+            i = 0
+            for g2 in set(groups):
+                if g1.league.championat == g2.league.championat:
+                    i += 1
+                if i > 1:
+                    messages.add_message(request, messages.ERROR, 'Not allowed many groups from one championat')
+                    return
+
+        self.check_related = True
+
+        if self.check_related:
+            super(TeamAdmin, self).save_model(request, obj, form, change)
+        else:
+            messages.add_message(request, messages.ERROR, 'Not allowed many groups from one championat')
+
+    def save_related(self, request, form, formsets, change):
+        if self.check_related:
+            super(TeamAdmin, self).save_related(request, form, formsets, change)
+
+    def message_user(self, request, message, level=messages.INFO, extra_tags='',
+                     fail_silently=False):
+        if self.check_related:
+            super(TeamAdmin, self).message_user(request, message, level, extra_tags, fail_silently)
 
 admin.site.register(Team, TeamAdmin)
 
@@ -198,7 +280,15 @@ admin.site.register(PlayerBid, PlayerBidAdmin)
 
 
 class PlayerTeamAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('id', 'player', 'team', 'championat', 'current')
+    list_filter = ('championat', 'player', 'team', 'current', 'position')
+
+    def get_form(self, request, obj=None, change=False, **kwargs):
+        form = super(PlayerTeamAdmin, self).get_form(request, obj, change, **kwargs)
+        form.base_fields['position'].required = False
+        form.base_fields['number'].required = False
+
+        return form
 
 admin.site.register(PlayerCurrentTeam, PlayerTeamAdmin)
 
