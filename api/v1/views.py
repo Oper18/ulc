@@ -12,6 +12,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 
@@ -36,7 +37,7 @@ class TestView(viewsets.ModelViewSet):
     """
     serializer_class = ChampionatSerializer
     queryset = Championat.objects.all()
-    authentication_classes = [SessionAuthentication, BasicAuthentication, TokenAuthentication]
+    authentication_classes = [SessionAuthentication, BasicAuthentication, JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -56,7 +57,7 @@ class TestAPIView(APIView):
     """
     Another test API view, like /api/test
     """
-    authentication_classes = [SessionAuthentication, BasicAuthentication, TokenAuthentication]
+    authentication_classes = [SessionAuthentication, BasicAuthentication, JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
@@ -79,7 +80,7 @@ class ChampionatModelView(viewsets.ModelViewSet):
     """
     serializer_class = ChampionatSerializer
     queryset = Championat.objects.all()
-    authentication_classes = [SessionAuthentication, BasicAuthentication, TokenAuthentication]
+    authentication_classes = [SessionAuthentication, BasicAuthentication, TokenAuthentication, JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -104,7 +105,7 @@ class LeagueModelView(viewsets.ModelViewSet):
     """
     serializer_class = LeagueSerializer
     queryset = League.objects.all()
-    authentication_classes = [SessionAuthentication, BasicAuthentication, TokenAuthentication]
+    authentication_classes = [SessionAuthentication, BasicAuthentication, JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -143,7 +144,7 @@ class GroupModelView(viewsets.ModelViewSet):
     """
     serializer_class = GroupSerializer
     queryset = Group.objects.all()
-    authentication_classes = [SessionAuthentication, BasicAuthentication, TokenAuthentication]
+    authentication_classes = [SessionAuthentication, BasicAuthentication, JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -187,7 +188,7 @@ class ChampionatAPIView(APIView):
     """
     Get tournament table: /league/<league_pk>/<group_pk>/<championat_pk>/
     """
-    authentication_classes = [SessionAuthentication, BasicAuthentication, TokenAuthentication]
+    authentication_classes = [SessionAuthentication, BasicAuthentication, JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
@@ -205,7 +206,7 @@ class CalendarAPIView(APIView):
     """
     Get calendar
     """
-    authentication_classes = [SessionAuthentication, BasicAuthentication, TokenAuthentication]
+    authentication_classes = [SessionAuthentication, BasicAuthentication, JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
@@ -294,9 +295,3 @@ class HistoryAPIView(APIView):
                 res[l.name][g.name] = winner
 
         return res
-
-
-@csrf_exempt
-def api_login(request):
-    token, status = Token.objects.get_or_create(user=User.objects.get(username=json.loads(request.body).get('username')))
-    return JsonResponse({'token': token.key}, status=200)

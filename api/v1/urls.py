@@ -5,6 +5,7 @@ from django.urls import include, path
 from rest_framework import routers
 
 from rest_framework_swagger.views import get_swagger_view
+from rest_framework_simplejwt import views as jwt_views
 
 from .views import *
 
@@ -17,7 +18,8 @@ ulc_view = get_swagger_view(title='ULC API')
 urlpatterns = [
     re_path(r'^api/docs/$', ulc_view),
     # path('', include(router.urls)),
-    re_path(r'^api/login/$', api_login, name='api_login'),
+    re_path('^api/token/$', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    re_path('^api/token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
 
     re_path(r'^api/test/$', TestView.as_view({
         'get': 'list',

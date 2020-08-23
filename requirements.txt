@@ -10,3 +10,4 @@ redis==3.4.1
 djangorestframework==3.11.0
 django-filter==2.2.0
 git+https://github.com/Oper18/django-rest-swagger.git
+djangorestframework-simplejwt==4.4.0
