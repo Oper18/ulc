@@ -3,7 +3,7 @@
 from rest_framework import serializers
 
 from championat.models import Season, Championat, DefaultTimeSlot, TimeSlot, League, Group, Team,\
-    Game, TeamBid, SuspensionTeamGroup
+    Game, TeamBid, SuspensionTeamGroup, News
 from accounts.models import Player, RegistrationKeys, PlayerBid, PlayerCurrentTeam
 
 
@@ -148,3 +148,10 @@ class PlayerBidSerializer(serializers.ModelSerializer):
     class Meta:
         model = PlayerBid
         fields = ['id', 'player', 'source_team', 'target_team', 'sended_date', 'accepted', 'declined']
+
+
+class NewsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = News
+        fields = ['id', 'head', 'head_img', 'preread', 'news_body']

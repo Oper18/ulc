@@ -12,7 +12,8 @@ from django.core.exceptions import PermissionDenied
 
 from django.contrib.auth.models import User
 
-from championat.models import Season, League, Group, Team, Game, Championat, TimeSlot, DefaultTimeSlot, TeamBid, SuspensionTeamGroup
+from championat.models import Season, League, Group, Team, Game, Championat, TimeSlot, DefaultTimeSlot, TeamBid, \
+    SuspensionTeamGroup, News
 from accounts.models import Player, RegistrationKeys, PlayerBid, PlayerCurrentTeam
 
 
@@ -298,3 +299,10 @@ class SuspensionTeamGroupAdmin(admin.ModelAdmin):
     list_filter = ('team', 'group')
 
 admin.site.register(SuspensionTeamGroup, SuspensionTeamGroupAdmin)
+
+
+class NewsAdmin(admin.ModelAdmin):
+    list_display = ('id', 'head')
+    list_filter = ('head',)
+
+admin.site.register(News, NewsAdmin)

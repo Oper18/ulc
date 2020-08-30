@@ -16,8 +16,13 @@ from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.http import JsonResponse
 from django.utils.timezone import now
 
-from championat.models import Season, League, Group, Team, Game, Championat, TimeSlot, TeamBid
+from rest_framework.permissions import AllowAny
+from rest_framework.views import APIView
+
+from championat.models import Season, League, Group, Team, Game, Championat, TimeSlot, TeamBid, News
 from accounts.models import PlayerCurrentTeam, Player
+
+from api.v1.serializers import NewsSerializer
 
 
 logger = logging.getLogger(__name__)
@@ -322,3 +327,43 @@ def answer_bid(request):
             tb.save()
 
         return JsonResponse({'success': True}, status=200)
+
+
+@csrf_exempt
+def get_news(request):
+    news = News.objects.all().order_by('-id')
+    qs = NewsSerializer(news, many=True).data
+    result = {'news': qs}
+    result['correct'] = request.user.is_staff
+    return JsonResponse(result)
+
+
+@csrf_protect
+def correct_news(request):
+    if request.user.is_staff:
+        if 'id' in request.POST.keys():
+            new = News.objects.get(pk=request.POST.get('id'))
+            head = request.POST.get('head', None)
+            head_img = request.FILES.get('head_img', None)
+            preread = request.POST.get('preread', None)
+            news_body = request.POST.get('news_body', None)
+            if head:
+                new.head = head
+            if head_img:
+                new.head_img = head_img
+            if preread:
+                new.preread = preread
+            if news_body:
+                new.news_body = news_body
+            new.save()
+            return JsonResponse({'success': True, 'new_id': new.id}, status=200)
+        else:
+            print('CREATE NEW')
+            new = News.objects.create(head=request.POST.get('head'),
+                                      head_img=request.FILES.get('head_img', None),
+                                      preread=request.POST.get('preread', None),
+                                      news_body=request.POST.get('news_body', None))
+            return JsonResponse({'success': True, 'new_id': new.id}, status=200)
+        return JsonResponse({'success': False}, status=403)
+    return JsonResponse({'success': False, 'reason': 'no permissions'}, status=409)
+

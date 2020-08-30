@@ -70,4 +70,11 @@ urlpatterns = [
     re_path(r'api/league/[0-9]+/[0-9]+/[0-9]+/$', ChampionatAPIView.as_view()),
     re_path(r'api/calendar/$', CalendarAPIView.as_view()),
     re_path(r'api/history/$', HistoryAPIView.as_view()),
+    re_path(r'api/get_news/$', NewsAPIView.as_view({
+        'get': 'list',
+        'put': 'create',
+    })),
+    re_path(r'api/get_news/(?P<pk>\d+)/$', NewsAPIView.as_view({
+        'post': 'update',
+    })),
 ]

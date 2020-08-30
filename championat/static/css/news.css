@@ -1,0 +1,40 @@
+li {
+    display: list-item;
+}
+.media {
+    color: #000;
+}
+.news_link {
+    text-decoration:none;
+}
+.preread {
+    display: block;
+}
+.new-body {
+    display: none;
+}
+.columns {
+    display: flex;
+}
+.correct_btn {
+    margin-left: auto;
+}
+.preread_text {
+    overflow-y: scroll;
+    height: 100px!important;
+}
+.input-group {
+    display: block;
+}
+.danger-input {
+    border-color: #dc3545;
+}
+.add-btn {
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    margin-bottom: 1rem;
+}
+.add-new-btn {
+    border-radius: 50px;
+}

@@ -7,7 +7,7 @@ services:
     environment:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_USER=${DB_USER}
-      - POSTGRES_DB=ulc
+      - POSTGRES_DB=${DB_NAME}
     networks:
       - ulc-network
     volumes:
@@ -29,6 +29,9 @@ services:
       - C_FORCE_ROOT='true'
       - PYTHONUNBUFFERED=1
       - TZ=Europe/Moscow
+      - DB_PASS=${DB_PASSWORD}
+      - DB_USER=${DB_USER}
+      - DB_NAME=${DB_NAME}
     ports:
       - 41999:8000
     depends_on:

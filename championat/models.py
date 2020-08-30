@@ -156,3 +156,13 @@ class SuspensionTeamGroup(models.Model):
                 game.save()
 
         super(SuspensionTeamGroup, self).save_base(raw, force_insert, force_update, using, update_fields)
+
+
+class News(models.Model):
+    head = models.CharField(verbose_name='News head', max_length=256)
+    head_img = models.ImageField(verbose_name='News image', upload_to='news_head_image', null=True, blank=True)
+    preread = models.TextField(verbose_name='Preread for card', null=True, blank=True)
+    news_body = models.TextField(verbose_name='News body html', null=True, blank=True)
+
+    def __str__(self):
+        return self.head

@@ -4,7 +4,7 @@ from django.urls import re_path
 from django.contrib.auth.decorators import login_required
 
 from championat.views import ChampionatView, CalendarView, ULCBaseTemplateView, HistoryULCView, accept_changes, \
-    decline_changes, save_bid, answer_bid
+    decline_changes, save_bid, answer_bid, get_news, correct_news
 
 
 urlpatterns = [
@@ -49,4 +49,6 @@ urlpatterns = [
 
     re_path(r'^ajax/save_bid/$', save_bid, name='save_bid'),
     re_path(r'^ajax/answer_bid/$', answer_bid, name='answer_bid'),
+    re_path(r'^ajax/get_news/$', get_news, name='get_news'),
+    re_path(r'^ajax/update_news/$', correct_news, name='correct_news'),
 ]

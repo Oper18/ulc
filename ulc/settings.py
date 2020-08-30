@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'accounts',
     'championat',
     'rest_framework',
-    'rest_framework.authtoken',
     'rest_framework_simplejwt',
     'api',
     'rest_framework_swagger',
@@ -85,9 +84,9 @@ WSGI_APPLICATION = 'ulc.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'ulc3',
-        'USER': 'ulc',
-        'PASSWORD': 'ulc',
+        'NAME': os.environ.get('DB_NAME', 'ulc'),
+        'USER': os.environ.get('DB_USER', 'ulc'),
+        'PASSWORD': os.environ.get('DB_PASS', 'ulc'),
         'HOST': 'ulc_db',
         'PORT': '5432'
     },

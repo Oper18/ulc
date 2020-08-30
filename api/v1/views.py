@@ -5,9 +5,10 @@ import re
 
 from django.contrib.auth.models import User
 from django.http import JsonResponse
+from django.shortcuts import render
 
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.models import Token
 from rest_framework import viewsets
 from rest_framework.views import APIView
@@ -18,13 +19,13 @@ from django.views.decorators.csrf import csrf_protect, csrf_exempt
 
 from .serializers import SeasonSerializer, ChampionatSerializer, DefaultTimeSlotSerializer, TimeSlotSerializer, \
     LeagueSerializer, GroupSerializer, TeamSerializer, GameSerializer, TeamBidSerializer, SuspensionTeamGroupSerializer, \
-    PlayerCurrentTeamSerializer, PlayerSerializer, PlayerBidSerializer
+    PlayerCurrentTeamSerializer, PlayerSerializer, PlayerBidSerializer, NewsSerializer
 
 from championat.models import Season, Championat, DefaultTimeSlot, TimeSlot, League, Group, Team, \
-    Game, TeamBid, SuspensionTeamGroup
+    Game, TeamBid, SuspensionTeamGroup, News
 from accounts.models import Player, RegistrationKeys, PlayerBid, PlayerCurrentTeam
 
-from championat.views import ChampionatView, CalendarView
+from championat.views import ChampionatView, CalendarView, ULCBaseTemplateView
 
 
 class TestView(viewsets.ModelViewSet):
@@ -295,3 +296,28 @@ class HistoryAPIView(APIView):
                 res[l.name][g.name] = winner
 
         return res
+
+
+class NewsAPIView(viewsets.ModelViewSet):
+
+    serializer_class = NewsSerializer
+    queryset = News.objects.all()
+    authentication_classes = [SessionAuthentication, BasicAuthentication, JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    # def list(self, request, *args, **kwargs):
+    #     pass
+    #
+    # def update(self, request, *args, **kwargs):
+    #     pass
+    #
+    # def create(self, request, *args, **kwargs):
+    #     pass
+
+
+class GetMenuView(APIView):
+
+    permission_classes = [AllowAny]
+
+    def get(self, request, format=None):
+        pass
