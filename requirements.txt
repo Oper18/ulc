@@ -7,7 +7,7 @@ google-auth-httplib2==0.0.3
 google-auth-oauthlib==0.4.1
 celery==4.4.2
 redis==3.4.1
-djangorestframework==3.11.0
+djangorestframework==3.11.2
 django-filter==2.2.0
 git+https://github.com/Oper18/django-rest-swagger.git
 djangorestframework-simplejwt==4.4.0
